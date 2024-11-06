@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Post Details</h1>
+    <div>
+        <h2 th:text="${post.postTitle}"></h2>
+        <p th:text="'Likes: ' + ${post.postLike}"></p>
+        <p th:text="'Dislikes: ' + ${post.postDislike}"></p>
+        <img th:src="${post.imgPath}" alt="Post Image" class="img-fluid"/> <!-- 이미지 경로 표시 -->
+        <a th:href="@{/home/posts(boardId = ${boardId})}" class="btn btn-secondary">Back to Posts</a>
+    </div>
+</div>
+</body>
+</html>

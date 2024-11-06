@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.team5_project.dto.BoardPostDto;
 import com.example.team5_project.entity.Board;
 import com.example.team5_project.service.BoardService;
 
@@ -20,32 +19,15 @@ import com.example.team5_project.service.BoardService;
 @Controller
 public class BoardController {
 	@Autowired private BoardService boardService;
-	@Autowired private PostController postController;
 	
 	// 전체 게시판 리스트
 	@GetMapping("/list")
-	public String getBaord(Model model) {
+	public String getBoard(Model model) {
 		model.addAttribute("boards", boardService.findBoards());
 		
 		return "board/list";
 	}
-	
-//	// 게시판 상세 조회(post페이지 home으로 이동해야함.)
-//	@GetMapping("/detail")
-//	public String getBoardDetail(@RequestParam Long boardId, Model model) {
-//		model.addAttribute("board", boardService.findBoard(boardId));
-//		
-//		return "board/detail";
-//	}
-	
-	// 게시판 상세 조회(post페이지 home으로 이동)
-	@GetMapping("/detail")
-	public String getBoardDetail(@RequestParam Long boardId, RedirectAttributes redirect) {
-		redirect.addAttribute("boardId", boardId);
 
-		return "redirect:/home/posts";
-	}	
-	
 	// 게시판 생성 페이지
 	@GetMapping("/create")
 	public String createBoardPage() {
