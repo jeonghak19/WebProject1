@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.team5_project.dto.BoardPostDto;
 import com.example.team5_project.entity.Board;
 import com.example.team5_project.service.BoardService;
 
@@ -20,25 +19,15 @@ import com.example.team5_project.service.BoardService;
 @Controller
 public class BoardController {
 	@Autowired private BoardService boardService;
-	// @Autowired private PostController postController;
 	
 	// 전체 게시판 리스트
 	@GetMapping("/list")
-	public String getBaord(Model model) {
+	public String getBoard(Model model) {
 		model.addAttribute("boards", boardService.findBoards());
 		
 		return "board/list";
 	}
-	
-	// 게시판 상세 조회(post페이지 home으로 이동해야함.)
-	@GetMapping("/detail")
-	public String getBoardDetail(@RequestParam Long boardId, Model model) {
-		model.addAttribute("board", boardService.findBoard(boardId));
 
-		return "board/detail";
-	}
-	
-	
 	// 게시판 생성 페이지
 	@GetMapping("/create")
 	public String createBoardPage() {
@@ -56,7 +45,7 @@ public class BoardController {
 
 	// 게시판 수정 페이지
 	@GetMapping("/update/{boardId}")
-	public String updateBoardPage(@PathVariable Long boardId, Model model) {
+	public String updateBoardPage(@PathVariable("boardId") Long boardId, Model model) {
 		model.addAttribute("board", boardService.findBoard(boardId));
 		
 		return "board/update";
@@ -67,19 +56,25 @@ public class BoardController {
 	public String updateBoard(Board board, RedirectAttributes redirect) {
 		boardService.updateBoard(board);		
 		redirect.addAttribute("boardId", board.getBoardId());
+		redirect.addAttribute("boardTitle",board.getBoardTitle());
 		
-		return "redirect:/board/detail";
+		return "redirect:/home/posts";
 	}	
 	
 	// 게시판 삭제
-	@PostMapping("/delete")
-	public String deleteBoard(@RequestParam Long boardId) {
+	public String deleteBoard(@RequestParam("boardId") Long boardId) {
 		Board board = boardService.findBoard(boardId);
 		boardService.deleteBoard(board);
 		
 		return "redirect:/board/list";
 	}
 }
+
+
+
+
+
+
 
 
 

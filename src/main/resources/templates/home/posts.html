@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${boardTitle}"></h1>
+
+    <!-- posts가 비어있는 경우 메시지 표시 -->
+    <div th:if="${#lists.isEmpty(posts)}" class="alert alert-warning">
+        <strong>No posts found.</strong> There are currently no posts to display.
+    </div>
+
+    <!-- posts가 있는 경우 테이블 표시 -->
+    <table class="table" th:if="${!#lists.isEmpty(posts)}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Likes</th>
+            <th>Dislikes</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="post : ${posts}">
+            <td th:text="${post.postId}"></td>
+            <td th:text="${post.postTitle}"></td>
+            <td th:text="${post.postLike}"></td>
+            <td th:text="${post.postDislike}"></td>
+            <td>
+                <a th:href="@{/home/posts/{id}(id=${post.postId}, boardId=${boardId})}" class="btn btn-info">View</a>
+                <form th:action="@{/home/posts/{id}/delete(id=${post.postId}, boardId = ${boardId})}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Add New Post</h2>
+    <form th:action="@{/home/posts(boardId =${boardId})}" method="post">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" name="postTitle" id="title" required>
+        </div>
+        <div class="form-group">
+            <label for="likes">Likes</label>
+            <input type="number" class="form-control" name="postLike" id="likes" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="dislikes">Dislikes</label>
+            <input type="number" class="form-control" name="postDislike" id="dislikes" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="imgPath">Image Path</label>
+            <input type="text" class="form-control" name="imgPath" id="imgPath" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Post</button>
+    </form>
+</div>
+
+	<form action="/board/list" method="get">
+		<button type="submit">게시판 목록</button>
+	</form>
+		<form th:action="@{/board/update/{boardId}(boardId= ${boardId})}" method="get">
+		<button type="submit">게시판 수정</button>
+	</form>
+	<form th:action="@{/board/delete(boardId = ${boardId})}" method="post">
+		<button type="submit">게시판 삭제</button>
+	</form>
+	
+</body>
+</html>
