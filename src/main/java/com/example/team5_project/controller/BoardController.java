@@ -56,8 +56,9 @@ public class BoardController {
 	public String updateBoard(Board board, RedirectAttributes redirect) {
 		boardService.updateBoard(board);		
 		redirect.addAttribute("boardId", board.getBoardId());
+		redirect.addAttribute("boardTitle",board.getBoardTitle());
 		
-		return "redirect:/board/detail";
+		return "redirect:/home/posts";
 	}	
 	
 	// 게시판 삭제

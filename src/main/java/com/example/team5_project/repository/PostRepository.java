@@ -9,7 +9,7 @@ public interface PostRepository {
     public Optional<Post> findById(Long id);
     public Post save(Post post, Long boardId);
     public void delete(Post post);
-    public Optional<List<Post>> findByBoardId(Long Id);
-    public Optional<List<Post>> findByUserId(Long Id);
-    public Optional<List<Post>> findByTitle(String Title);
+    public List<Post> findByBoardId(Long Id);
+    public List<Post> findByUserId(Long Id);
+    public List<Post> findByTitle(String Title);
 }

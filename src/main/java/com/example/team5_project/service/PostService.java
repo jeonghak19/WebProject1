@@ -1,9 +1,7 @@
 package com.example.team5_project.service;
 
-import com.example.team5_project.entity.Board;
+
 import com.example.team5_project.entity.Post;
-import com.example.team5_project.entity.User;
-import com.example.team5_project.repository.BoardRepository;
 import com.example.team5_project.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,18 +27,18 @@ public class PostService {
     }
 
     public List<Post> findPostByBoardId(Long boardId){
-        return postRepository.findByBoardId(boardId)
-                .orElseThrow(()->new RuntimeException("해당 게시판에는 게시물이 없습니다."));
+        return postRepository.findByBoardId(boardId);
+
     }
 
     public List<Post> findUserPosts(Long userId){
-        return postRepository.findByUserId(userId)
-                .orElseThrow(()->new RuntimeException("해당 사용자에게는 게시물이 없습니다."));
+        return postRepository.findByUserId(userId);
+
     }
 
     public List<Post> findSearchPost(String title){
-        return postRepository.findByTitle(title)
-                .orElseThrow(()->new RuntimeException("해당 제목에 해당하는 게시물이 없습니다."));
+        return postRepository.findByTitle(title);
+
     }
 
     public Post createPost(Post post, Long boardId){

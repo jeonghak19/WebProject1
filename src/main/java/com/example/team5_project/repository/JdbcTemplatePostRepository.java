@@ -1,9 +1,7 @@
 package com.example.team5_project.repository;
 
-import com.example.team5_project.entity.Board;
+
 import com.example.team5_project.entity.Post;
-import com.example.team5_project.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -13,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Repository
 public class JdbcTemplatePostRepository implements PostRepository {
@@ -94,28 +92,28 @@ public class JdbcTemplatePostRepository implements PostRepository {
     }
 
     @Override
-    public Optional<List<Post>> findByBoardId(Long boardId) {
+    public List<Post> findByBoardId(Long boardId) {
         String sql = "SELECT * FROM post WHERE board_id = ?";
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{boardId}, postRowMapper);
 
-        return posts.isEmpty() ? Optional.empty() : Optional.of(posts);
+        return posts;
     }
 
     @Override
-    public Optional<List<Post>> findByUserId(Long userId) {
+    public List<Post> findByUserId(Long userId) {
         String sql = "SELECT * FROM post WHERE user_id = ?";
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{userId}, postRowMapper);
 
-        return posts.isEmpty() ? Optional.empty() : Optional.of(posts);
+        return posts;
     }
 
     @Override
-    public Optional<List<Post>> findByTitle(String title) {
+    public List<Post> findByTitle(String title) {
         String sql = "SELECT * FROM post WHERE post_title LIKE ?";
         String searchTitle = "%" + title + "%";
 
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{searchTitle}, postRowMapper);
 
-        return posts.isEmpty() ? Optional.empty() : Optional.of(posts);
+        return posts;
     }
 }

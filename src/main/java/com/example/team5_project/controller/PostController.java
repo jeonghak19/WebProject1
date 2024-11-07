@@ -16,9 +16,11 @@ public class PostController {
     
   
   @GetMapping()
-  public String posts(Model model, @RequestParam Long boardId) {
+  public String posts(Model model, @RequestParam Long boardId, @RequestParam String boardTitle) {
       model.addAttribute("posts", postService.findPostByBoardId(boardId));
       model.addAttribute("boardId", boardId);
+      model.addAttribute("boardTitle", boardTitle);
+      System.out.println("보드 이름" + boardTitle);
       return "home/posts";
   }
   

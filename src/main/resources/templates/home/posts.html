@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>Posts</h1>
+    <h1 th:text="${boardTitle}"></h1>
 
     <!-- posts가 비어있는 경우 메시지 표시 -->
     <div th:if="${#lists.isEmpty(posts)}" class="alert alert-warning">
@@ -68,5 +68,12 @@
 	<form action="/board/list" method="get">
 		<button type="submit">게시판 목록</button>
 	</form>
+		<form th:action="@{/board/update/{boardId}(boardId= ${boardId})}" method="get">
+		<button type="submit">게시판 수정</button>
+	</form>
+	<form th:action="@{/board/delete(boardId = ${boardId})}" method="post">
+		<button type="submit">게시판 삭제</button>
+	</form>
+	
 </body>
 </html>
