@@ -16,17 +16,19 @@ public class PostController {
     
   
   @GetMapping()
-  public String posts(Model model, @RequestParam Long boardId, @RequestParam String boardTitle) {
+  public String posts(Model model, @RequestParam("boardId") Long boardId, 
+		  						   @RequestParam("boardTitle") String boardTitle) {
       model.addAttribute("posts", postService.findPostByBoardId(boardId));
       model.addAttribute("boardId", boardId);
       model.addAttribute("boardTitle", boardTitle);
-      System.out.println("보드 이름" + boardTitle);
+
       return "home/posts";
   }
   
 
     @GetMapping("/{postId}")
-    public String post(@PathVariable("postId") Long postId, @RequestParam Long boardId, Model model) {
+    public String post(@PathVariable("postId") Long postId, 
+    				   @RequestParam("boardId") Long boardId, Model model) {
         model.addAttribute("post",postService.findPost(postId));
         model.addAttribute("boardId", boardId);
 
@@ -39,7 +41,7 @@ public class PostController {
             @RequestParam("postLike") Integer postLike,
             @RequestParam("postDislike") Integer postDislike,
             @RequestParam("imgPath") String imgPath, 
-    		@RequestParam Long boardId,										
+    		@RequestParam("boardId") Long boardId,										
     		RedirectAttributes redirect) {
 
         Post newPost = new Post();
@@ -55,15 +57,22 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public String updatePost(@PathVariable("id") Long id, @RequestBody Post post, @RequestParam Long boardId) {
+    public String updatePost(@PathVariable("id") Long id, 
+    						 @RequestBody Post post, 
+    						 @RequestParam("boardId") Long boardId, 
+    						 @RequestParam("boardTitle") String boardTitle) {
         postService.updatePost(post, boardId);
         return "redirect:/home/posts";
     }
 
     @PostMapping("/{postId}/delete")
-    public String deletePost(@PathVariable("postId") Long postId, @RequestParam Long boardId, RedirectAttributes redirect) {
+    public String deletePost(@PathVariable("postId") Long postId, 
+    			             @RequestParam("boardId") Long boardId,
+    			             @RequestParam("boardTitle") String boardTitle,
+    			             RedirectAttributes redirect) {
         postService.deletePost(postId);
         redirect.addAttribute("boardId", boardId);
+        redirect.addAttribute("boardTitle", boardTitle);
         return "redirect:/home/posts";
     }
 }

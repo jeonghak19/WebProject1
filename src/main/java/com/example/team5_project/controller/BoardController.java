@@ -45,7 +45,7 @@ public class BoardController {
 
 	// 게시판 수정 페이지
 	@GetMapping("/update/{boardId}")
-	public String updateBoardPage(@PathVariable Long boardId, Model model) {
+	public String updateBoardPage(@PathVariable("boardId") Long boardId, Model model) {
 		model.addAttribute("board", boardService.findBoard(boardId));
 		
 		return "board/update";
@@ -63,7 +63,7 @@ public class BoardController {
 	
 	// 게시판 삭제
 	@PostMapping("/delete")
-	public String deleteBoard(@RequestParam Long boardId) {
+	public String deleteBoard(@RequestParam("boardId") Long boardId) {
 		Board board = boardService.findBoard(boardId);
 		boardService.deleteBoard(board);
 		

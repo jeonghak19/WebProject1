@@ -35,7 +35,9 @@
             <td th:text="${post.postDislike}"></td>
             <td>
                 <a th:href="@{/home/posts/{id}(id=${post.postId}, boardId=${boardId})}" class="btn btn-info">View</a>
-                <form th:action="@{/home/posts/{id}/delete(id=${post.postId}, boardId = ${boardId})}" method="POST" style="display:inline;">
+                <form th:action="@{/home/posts/{id}/delete(id=${post.postId}, 
+                											boardId = ${boardId}, 
+                											boardTitle= ${boardTitle})}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>
