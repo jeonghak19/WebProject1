@@ -46,7 +46,7 @@ public class PostService {
     }
 
     public Post updatePost(Post post, Long boardId){
-        Post findpost=postRepository.findById(post.getPostId())
+        Post findpost = postRepository.findById(post.getPostId())
                 .orElseThrow(()->new RuntimeException());
 
         Optional.ofNullable(post.getPostTitle())
@@ -62,9 +62,8 @@ public class PostService {
     }
 
     public void deletePost(Long postId){
-        Post findPost=postRepository.findById(postId)
-                .orElseThrow(()->new RuntimeException());
-        postRepository.delete(findPost);
+        Post post = findPost(postId);
+        postRepository.delete(post);
     }   
 
 }

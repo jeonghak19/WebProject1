@@ -72,7 +72,7 @@ public class JdbcTemplatePostRepository implements PostRepository {
                 post.setPostId(key.longValue());
             }
         }else{
-            String sql = "UPDATE post SET post_title = ?, post_like = ?, post_dislike = ?, img_path = ? board_id = ? WHERE post_id = ?";
+            String sql = "UPDATE post SET post_title = ?, post_like = ?, post_dislike = ?, img_path = ? WHERE board_id = ? AND post_id = ?";
             jdbcTemplate.update(sql,
                     post.getPostTitle(),
                     post.getPostLike(),
@@ -87,8 +87,8 @@ public class JdbcTemplatePostRepository implements PostRepository {
 
     @Override
     public void delete(Post post) {
-        String sql = "delete from post where post_id = ?";
-        jdbcTemplate.update(sql,post.getPostId());
+        String sql = "DELETE FROM post WHERE post_id = ?";
+        jdbcTemplate.update(sql, post.getPostId());
     }
 
     @Override

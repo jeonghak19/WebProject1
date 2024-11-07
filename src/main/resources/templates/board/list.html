@@ -8,7 +8,7 @@
 <table>
 	<tr th:each="board : ${boards}">
 		<td>
-			<a th:href="@{/home/posts(boardId=${board.boardId}, boardTitle=${board.boardTitle})}" th:text="${board.boardTitle}"></a>
+			<a th:href="@{/home/posts(boardId=${board.boardId})}" th:text="${board.boardTitle}"></a>
 		</td>
 	</tr>
 </table>

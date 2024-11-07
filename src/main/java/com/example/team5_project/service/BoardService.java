@@ -42,4 +42,9 @@ public class BoardService {
 		boardRepository.delete(board);
 	}
 	
+	// boardTitle 불러오기
+	public String getBoardTitle(Long boardId) {
+		return findBoard(boardId).getBoardTitle();
+	}
+	
  }

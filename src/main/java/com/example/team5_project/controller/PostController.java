@@ -1,78 +1,92 @@
 package com.example.team5_project.controller;
 
 import com.example.team5_project.entity.Post;
+import com.example.team5_project.service.BoardService;
 import com.example.team5_project.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RequestMapping("/home/posts")
 @Controller
 public class PostController {
 
     @Autowired private PostService postService;
+    @Autowired private BoardService boardService;
+    @Autowired private UserController userController;
     
-  
+  // 전체 게시글 리스트
   @GetMapping()
-  public String posts(Model model, @RequestParam("boardId") Long boardId, 
-		  						   @RequestParam("boardTitle") String boardTitle) {
-      model.addAttribute("posts", postService.findPostByBoardId(boardId));
+  public String posts(Model model, @RequestParam("boardId") Long boardId) {
+      
+	  model.addAttribute("posts", postService.findPostByBoardId(boardId));
+	  model.addAttribute("boardTitle", boardService.getBoardTitle(boardId));
       model.addAttribute("boardId", boardId);
-      model.addAttribute("boardTitle", boardTitle);
-
+      
       return "home/posts";
   }
   
-
+  	// 게시글 상세 페이지
     @GetMapping("/{postId}")
     public String post(@PathVariable("postId") Long postId, 
-    				   @RequestParam("boardId") Long boardId, Model model) {
-        model.addAttribute("post",postService.findPost(postId));
+    				   @RequestParam("boardId") Long boardId,
+    				   Model model) {
+        model.addAttribute("post", postService.findPost(postId));
         model.addAttribute("boardId", boardId);
 
         return "home/post-details";
     }
-
+    
+    // 게시글 생성
     @PostMapping
-    public String createPost(
-            @RequestParam("postTitle") String postTitle,
-            @RequestParam("postLike") Integer postLike,
-            @RequestParam("postDislike") Integer postDislike,
-            @RequestParam("imgPath") String imgPath, 
-    		@RequestParam("boardId") Long boardId,										
-    		RedirectAttributes redirect) {
+    public String createPost(Post post, @RequestParam("boardId") Long boardId, RedirectAttributes redirect) {
 
-        Post newPost = new Post();
-        newPost.setPostTitle(postTitle);
-        newPost.setPostLike(postLike);
-        newPost.setPostDislike(postDislike);
-        newPost.setImgPath(imgPath);
-
-        postService.createPost(newPost, boardId);
+        postService.createPost(post, boardId);
         redirect.addAttribute("boardId", boardId);
         
         return "redirect:/home/posts";
     }
+    
+    // 게시글 수정 페이지
+    @GetMapping("/update/{postId}")
+    public String updatePostPage(@PathVariable("postId") Long postId,
+    						     @RequestParam(value ="boardId", required=false) Long boardId,
+    						     Model model){
 
-    @PatchMapping("/{id}")
-    public String updatePost(@PathVariable("id") Long id, 
-    						 @RequestBody Post post, 
-    						 @RequestParam("boardId") Long boardId, 
-    						 @RequestParam("boardTitle") String boardTitle) {
-        postService.updatePost(post, boardId);
+    	model.addAttribute("post", postService.findPost(postId));
+    	model.addAttribute("boardId", boardId);
+
+    	return "home/posts-update";
+    }   
+    
+    
+    // 게시글 수정
+    @PostMapping("/update")
+    public String updatePost(@RequestParam("postId") Long postId, 
+    						 Post post, 
+    						 @RequestParam("boardId") Long boardId,
+    						 RedirectAttributes redirect) { 	
+
+    	redirect.addAttribute("boardId", boardId);
+    	postService.updatePost(post, boardId);
+       
         return "redirect:/home/posts";
     }
-
-    @PostMapping("/{postId}/delete")
-    public String deletePost(@PathVariable("postId") Long postId, 
+    
+    // 게시글 삭제
+    @PostMapping("/delete")
+    public String deletePost(@RequestParam("postId") Long postId, 
     			             @RequestParam("boardId") Long boardId,
-    			             @RequestParam("boardTitle") String boardTitle,
     			             RedirectAttributes redirect) {
-        postService.deletePost(postId);
+        
+    	postService.deletePost(postId);
         redirect.addAttribute("boardId", boardId);
-        redirect.addAttribute("boardTitle", boardTitle);
+
         return "redirect:/home/posts";
     }
 }
