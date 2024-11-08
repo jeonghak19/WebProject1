@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{header :: head}"></head>
+<body>
+<div th:replace="~{navbar :: div}"></div>
+<h2>Add New Post</h2>
+<form action="/home/posts" method="post">
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input type="text" class="form-control" name="postTitle" id="title" required>
+  </div>
+  <div class="form-group">
+    <label for="likes">Likes</label>
+    <input type="number" class="form-control" name="postLike" id="likes" value="0" required>
+  </div>
+  <div class="form-group">
+    <label for="dislikes">Dislikes</label>
+    <input type="number" class="form-control" name="postDislike" id="dislikes" value="0" required>
+  </div>
+  <div class="form-group">
+    <label for="imgPath">Image Path</label>
+    <input type="text" class="form-control" name="imgPath" id="imgPath" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Create Post</button>
+</form>
+<form th:action="@{/board/delete(boardId = ${board.boardId})}" method="post">
+  <button type="submit">삭제</button>
+</form>
+<div th:replace="~{footer :: footer}"></div>
+</body>
+</html>

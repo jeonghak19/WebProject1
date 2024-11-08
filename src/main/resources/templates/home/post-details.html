@@ -15,51 +15,139 @@
         <p th:if="${post.createdAt} != ${post.updatedAt}" th:text="'수정일: ' + ${post.updatedAt}"></p>
 <!--         <p th:text="'Likes: ' + ${post.postLike}"></p>
         <p th:text="'Dislikes: ' + ${post.postDislike}"></p> -->
-        
-	<div th:if="${post.imgName} !=null">
-		<a th:href="@{${post.imgPath}}" class="img-fluid" th:text="${imgName}"></a>
-	</div>
+
+        <div th:if="${post.imgName} !=null">
+            <a th:href="@{${post.imgPath}}" class="img-fluid" th:text="${imgName}"></a>
+        </div>
+
 
         <a th:href="@{/home/posts(boardId = ${boardId})}" class="btn btn-secondary">Back to Posts</a>
 
-		<form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/home/posts/update">
-			<input type="hidden" name="boardId" th:value="${boardId}">
-			<input type="hidden" name="postId" th:value="${post.postId}">
-			<input type="hidden" name="imgName" th:value="${imgName}">
-    		<button type="submit" class="btn btn-warning">게시글 수정</button>
-		</form>
-		
-        <form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/home/posts/delete" method="POST" style="display:inline;">
-			<input type="hidden" name="postId" th:value="${post.postId}">
-			<input type="hidden" name="boardId" th:value="${boardId}">
-			<button type="submit" class="btn btn-danger">게시글 삭제</button>
-		</form>
+        <form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/home/posts/update">
+            <input type="hidden" name="boardId" th:value="${boardId}">
+            <input type="hidden" name="postId" th:value="${post.postId}">
+            <input type="hidden" name="imgName" th:value="${imgName}">
+            <button type="submit" class="btn btn-warning">게시글 수정</button>
+        </form>
 
-<!-- 댓글 리스트 -->
+
+
+        <!-- 댓글 리스트 -->
+        <form th:action="@{/home/posts/{postId}/comments(postId=${post.postId})}" method="post">
+            <textarea name="content" placeholder="댓글을 입력하세요" required></textarea>
+            <input type="hidden" name="boardId" th:value="${boardId}">
+            <button type="submit" class="btn btn-primary">댓글 작성</button>
+        </form>
+
         <div class="comment-list mt-4">
             <div th:each="comment : ${comments}">
                 <div class="comment mb-3">
                     <!-- 수정 및 삭제 버튼 -->
-                    <div th:if="${session.user != null and session.user.userId == comment.user.userId}">
-                        <form th:action="@{/home/posts/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" class="d-inline">
+                    <div th:if="${comment.user != null and session.user != null and comment.user.userId == session.user.userId}">
+                        <form th:action="@{/home/posts/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="boardId" th:value="${boardId}">
                             <button type="submit" class="btn btn-danger btn-sm">삭제</button>
                         </form>
-                        <a th:href="@{/home/posts/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}" class="btn btn-warning btn-sm">수정</a>
-                    </div>
-                    
-                    <!-- 댓글 작성자의 이름을 표시하는 부분 수정 -->
-                    <p><strong th:text="${comment.user.name}">User Name</strong> <span th:text="${comment.commentTime}">Time</span></p>
-                    <p th:text="${comment.content}">Content</p>
 
+                        <!-- 수정 버튼 (모달 창 열기) -->
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#editCommentModal" 
+                                th:data-comment-id="${comment.commentId}"
+                                th:data-comment-content="${comment.content}"
+                                th:data-post-id="${post.postId}">
+                            수정
+                        </button>
+                    </div>
+
+                    <!-- 댓글 작성자의 이름을 표시하는 부분 -->
+                    <p><strong th:text="${comment.user != null ? comment.user.name : 'Anonymous'}">User Name</strong>
+                        <span th:text="${comment.commentTime}">Time</span>
+                    </p>
+                    <p th:text="${comment.content}">Content</p>
                 </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 댓글 수정 모달 -->
+<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCommentModalLabel">댓글 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCommentForm">
+                    <div class="mb-3">
+                        <textarea class="form-control" id="editCommentContent" rows="3" required></textarea>
+                    </div>
+                    <input type="hidden" id="commentId">
+                    <input type="hidden" id="postId"> <!-- 추가: postId를 hidden으로 저장 -->
+                    <button type="submit" class="btn btn-primary">수정하기</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-
-
 <div th:replace="~{footer :: footer}"></div>
+
+<!-- Bootstrap JS (필요한 경우) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 수정 버튼 클릭 시 모달에 댓글 정보 채우기
+    const editButtons = document.querySelectorAll('.btn-warning');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const commentContent = this.getAttribute('data-comment-content');
+            const postId = this.getAttribute('data-post-id'); // postId를 가져옴
+            
+            // 모달에 댓글 정보 채우기
+            document.getElementById('commentId').value = commentId;
+            document.getElementById('editCommentContent').value = commentContent;
+            document.getElementById('postId').value = postId; // postId도 채우기
+        });
+    });
+
+    // 수정 폼 제출
+    const form = document.getElementById('editCommentForm');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const commentId = document.getElementById('commentId').value;
+        const postId = document.getElementById('postId').value;
+        const newContent = document.getElementById('editCommentContent').value;
+
+        // 서버로 수정된 댓글 내용 전송 (AJAX 사용)
+        fetch(`/home/posts/${postId}/comments/${commentId}/edit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: newContent })  // JSON 형식으로 데이터 전송
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('댓글이 수정되었습니다.');
+                location.reload();  // 새로고침으로 댓글 내용 반영
+            } else {
+                alert('수정에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
 
 </body>
 </html>

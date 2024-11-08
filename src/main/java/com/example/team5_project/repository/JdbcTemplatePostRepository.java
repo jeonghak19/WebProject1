@@ -123,11 +123,11 @@ public class JdbcTemplatePostRepository implements PostRepository {
     }
 
     @Override
-    public List<Post> findByTitle(String title) {
-        String sql = "SELECT * FROM post WHERE post_title LIKE ?";
+    public List<Post> findByTitle(String title,Long boardId) {
+        String sql = "SELECT * FROM post WHERE post_title LIKE ? and board_id = ?";
         String searchTitle = "%" + title + "%";
 
-        List<Post> posts = jdbcTemplate.query(sql, new Object[]{searchTitle}, postRowMapper);
+        List<Post> posts = jdbcTemplate.query(sql, new Object[]{searchTitle,boardId}, postRowMapper);
 
         return posts;
     }

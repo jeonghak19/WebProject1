@@ -8,6 +8,12 @@
 
 <div class="container">
     <h1 th:text="${boardTitle}"></h1>
+    <!-- 검색창 추가 -->
+    <form action="/home/posts/search" method="get" class="form-inline mb-3">
+        <input type="hidden" name="boardId" th:value="${boardId}">
+        <input type="text" name="searchTitle" class="form-control mr-2" placeholder="Search posts by title" />
+        <button type="submit" class="btn btn-primary">검색</button>
+    </form>
 
     <!-- posts가 비어있는 경우 메시지 표시 -->
     <div th:if="${#lists.isEmpty(posts)}" class="alert alert-warning">
@@ -37,6 +43,13 @@
             <td th:text="${post.user.name}"></td>
             <td>
                 <a th:href="@{/home/posts/{postId}(postId=${post.postId}, boardId=${boardId})}" class="btn btn-info">View</a>
+                
+                <form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/home/posts/delete" method="POST" style="display:inline;">
+                	<input type="hidden" name="postId" th:value="${post.postId}">
+                	<input type="hidden" name="boardId" th:value="${boardId}">
+
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
             </td>
         </tr>
         </tbody>

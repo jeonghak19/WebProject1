@@ -54,31 +54,30 @@ public class JdbcTemplateCommentRepository implements CommentRepository {
 
     @Override
     public Comment save(Comment comment) {
-        if(comment.getCommentId()==null){
-            String sql = "INSERT INTO comment (post_id, user_id, content, comment_time) VALUES (?,?,?,?) ";
+        if (comment.getCommentId() == null) { // 새 댓글 추가
+            String sql = "INSERT INTO comment (post_id, user_id, content, comment_time) VALUES (?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(sql,new String[]{"comment_id"});
-                ps.setLong(1, comment.getCommentId());
-                ps.setLong(2, comment.getUser().getUserId());
-                ps.setString(3, comment.getContent());
-                ps.setTimestamp(4, comment.getCommentTime());
+                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"comment_id"});
+                ps.setLong(1, comment.getPost().getPostId()); // postId 설정
+                ps.setLong(2, comment.getUser().getUserId()); // userId 설정
+                ps.setString(3, comment.getContent()); // 댓글 내용 설정
+                ps.setTimestamp(4, comment.getCommentTime()); // 댓글 시간 설정
                 return ps;
-            },keyHolder);
-            Number key=keyHolder.getKey();
-            if(key!=null){
-                comment.setCommentId(key.longValue());
+            }, keyHolder);
+
+            Number key = keyHolder.getKey();
+            if (key != null) {
+                comment.setCommentId(key.longValue()); // 자동 생성된 commentId 설정
             }
-        }else{
+        } else { // 기존 댓글 수정
             String sql = "UPDATE comment SET content = ? WHERE comment_id = ?";
-            jdbcTemplate.update(sql,
-                    comment.getContent(),
-                    comment.getCommentId()
-            );
+            jdbcTemplate.update(sql, comment.getContent(), comment.getCommentId());
         }
         return comment;
     }
+
 
     @Override
     public void delete(Comment comment) {

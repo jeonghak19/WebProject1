@@ -11,5 +11,5 @@ public interface PostRepository {
     public void delete(Post post);
     public List<Post> findByBoardId(Long Id);
     public List<Post> findByUserId(Long Id);
-    public List<Post> findByTitle(String Title);
+    public List<Post> findByTitle(String Title,Long boardId);
 }

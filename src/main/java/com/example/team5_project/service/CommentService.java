@@ -59,5 +59,8 @@ public class CommentService {
     public List<Comment> findCommentsByUserId(Long userId) {
         return commentRepository.findByUserId(userId);
     }
+    public Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId).orElse(null);
+    }
 
 }

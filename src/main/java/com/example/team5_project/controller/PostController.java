@@ -154,4 +154,19 @@ public class PostController {
 
         return "redirect:/home/posts";
     }
+
+    @GetMapping("/search")
+    public String searchPosts(@RequestParam("boardId") Long boardId,
+                              @RequestParam("searchTitle") String searchTitle,
+                              Model model) {
+        model.addAttribute("boardTitle", boardService.getBoardTitle(boardId));
+        model.addAttribute("boardId", boardId);
+        if(searchTitle.equals("")){
+            model.addAttribute("posts", postService.findPostByBoardId(boardId));
+        }else{
+            model.addAttribute("posts", postService.findSearchPost(searchTitle,boardId));
+        }
+        return "home/posts"; // 기존 페이지와 동일하게 렌더링
+    }
+
 }
