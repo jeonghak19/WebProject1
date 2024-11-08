@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentService {
@@ -35,11 +36,28 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
+    public Comment updateComment(Comment comment) {
+        Comment findcomment = commentRepository.findById(comment.getCommentId())
+                .orElseThrow(()->new RuntimeException());
+
+        Optional.ofNullable(comment.getContent())
+                .ifPresent(content->findcomment.setContent(content));
+        Optional.ofNullable(comment.getCommentTime())
+                .ifPresent(time->findcomment.setCommentTime(time));
+        findcomment.setCommentTime(new Timestamp(System.currentTimeMillis()));
+        return commentRepository.save(findcomment);
+    }
+
     public List<Comment> findCommentsByPostId(Long postId) {
-        return commentRepository.findByPostPostIdOrderByCommentTimeDesc(postId);
+        return commentRepository.findByPostId(postId);
     }
 
     public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+        commentRepository.delete(commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found")));
     }
+
+    public List<Comment> findCommentsByUserId(Long userId) {
+        return commentRepository.findByUserId(userId);
+    }
+
 }

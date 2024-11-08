@@ -1,64 +1,100 @@
 package com.example.team5_project.repository;
 
-
-
+import com.example.team5_project.entity.Board;
+import com.example.team5_project.entity.Post;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.example.team5_project.entity.Comment;
-import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public class JdbcTemplateCommentRepository {
+public class JdbcTemplateCommentRepository implements CommentRepository {
 
-    private final JdbcTemplate jdbcTemplate;
-
-    public JdbcTemplateCommentRepository(JdbcTemplate jdbcTemplate) {
+    private JdbcTemplate jdbcTemplate;
+    private UserRepository userRepository;
+    private PostRepository postRepository;
+    
+    public JdbcTemplateCommentRepository(JdbcTemplate jdbcTemplate, UserRepository userRepository,PostRepository postRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
-    // 댓글 작성
-    public void saveComment(Comment comment) {
-        String sql = "INSERT INTO comment (post_id, user_id, content, comment_time) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, comment.getPost().getPostId(), comment.getUser().getUserId(), 
-                comment.getContent(), new Timestamp(System.currentTimeMillis()));
+    private final RowMapper<Comment> commentRowMapper = (rs, rowNum) -> {
+        Comment comment = new Comment();
+        comment.setCommentId(rs.getLong("comment_id"));
+        comment.setContent(rs.getString("content"));
+        comment.setCommentTime(rs.getTimestamp("comment_time"));
+
+        Optional<User> user = userRepository.findById(rs.getLong("user_id"));
+        comment.setUser(user.isPresent() ? user.get() : null);
+
+        Optional<Post> post = postRepository.findById(rs.getLong("post_id"));
+        comment.setPost(post.isPresent() ? post.get() : null);
+
+        return comment;
+    };
+    
+    @Override
+    public Optional<Comment> findById(Long id) {
+        String sql = "select * from comment where Comment_id = ?";
+        return jdbcTemplate.query(sql, commentRowMapper, new Object[]{id}).stream().findFirst();
     }
 
-    // 댓글 목록 불러오기
-    public List<Comment> getCommentsByPost(Long postId) {
-        String sql = "SELECT * FROM comment WHERE post_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{postId}, new RowMapper<Comment>() {
-            @Override
-            public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Comment comment = new Comment();
-                comment.setCommentId(rs.getLong("comment_id"));
-                comment.setContent(rs.getString("content"));
-                comment.setCommentTime(rs.getTimestamp("comment_time"));
-                
-                // Post 및 User 엔티티 설정
-                Post post = new Post(); // 실제 Post 엔티티에서 조회해야 합니다.
-                post.setPostId(rs.getLong("post_id"));
-                comment.setPost(post);
+    @Override
+    public Comment save(Comment comment) {
+        if(comment.getCommentId()==null){
+            String sql = "INSERT INTO comment (post_id, user_id, content, comment_time) VALUES (?,?,?,?) ";
+            KeyHolder keyHolder = new GeneratedKeyHolder();
 
-                User user = new User(); // 실제 User 엔티티에서 조회해야 합니다.
-                user.setUserId(rs.getLong("user_id"));
-                comment.setUser(user);
-
-                return comment;
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql,new String[]{"comment_id"});
+                ps.setLong(1, comment.getCommentId());
+                ps.setLong(2, comment.getUser().getUserId());
+                ps.setString(3, comment.getContent());
+                ps.setTimestamp(4, comment.getCommentTime());
+                return ps;
+            },keyHolder);
+            Number key=keyHolder.getKey();
+            if(key!=null){
+                comment.setCommentId(key.longValue());
             }
-        });
+        }else{
+            String sql = "UPDATE comment SET content = ? WHERE comment_id = ?";
+            jdbcTemplate.update(sql,
+                    comment.getContent(),
+                    comment.getCommentId()
+            );
+        }
+        return comment;
     }
 
-    // 댓글 삭제
-    public void deleteComment(Long commentId) {
-        String sql = "DELETE FROM comment WHERE comment_id = ?";
-        jdbcTemplate.update(sql, commentId);
+    @Override
+    public void delete(Comment comment) {
+        String sql = "delete from comment where comment_id = ?";
+        jdbcTemplate.update(sql,comment.getCommentId());
+    }
+
+    @Override
+    public List<Comment> findByPostId(Long Id) {
+        String sql = "select * from comment where post_id = ?";
+        return jdbcTemplate.query(sql,new Object[]{Id},commentRowMapper);
+    }
+
+    @Override
+    public List<Comment> findByUserId(Long Id) {
+        String sql = "select * from comment where user_id = ?";
+        return jdbcTemplate.query(sql,new Object[]{Id},commentRowMapper);
     }
 }

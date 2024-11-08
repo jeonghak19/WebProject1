@@ -5,7 +5,6 @@ import com.example.team5_project.entity.Post;
 import com.example.team5_project.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,3 +96,5 @@ public class PostService {
     }   
 
 }
+
+

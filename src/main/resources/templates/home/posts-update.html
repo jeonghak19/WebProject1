@@ -8,8 +8,6 @@
 <div th:replace="~{navbar :: div}"></div>
 <script type="text/javascript">
 		function changeFile(target) {
-	  		//setFile(e.target.file[0]);
-	  		//e.target.value = '';
 	  		var file = target.files[0];
 	  		document.getElementById("fileName").innerText = file.name;
 		}

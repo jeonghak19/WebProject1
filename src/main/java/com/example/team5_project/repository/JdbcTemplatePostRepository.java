@@ -99,7 +99,10 @@ public class JdbcTemplatePostRepository implements PostRepository {
 
     @Override
     public void delete(Post post) {
+        String childSql = "DELETE FROM comment WHERE post_id = ?";
         String sql = "DELETE FROM post WHERE post_id = ?";
+        
+        jdbcTemplate.update(childSql, post.getPostId());
         jdbcTemplate.update(sql, post.getPostId());
     }
 

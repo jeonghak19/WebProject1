@@ -3,10 +3,13 @@ package com.example.team5_project.controller;
 import com.example.team5_project.entity.User;
 import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.mapper.UserMapper;
+import com.example.team5_project.service.CommentService;
+import com.example.team5_project.service.PostService;
 import com.example.team5_project.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private PostService postService;
+    @Autowired
+    private CommentService commentService;
 
     // 사용자 목록 가져오기
     @GetMapping("/home/users")
@@ -51,17 +58,27 @@ public class UserController {
 
     // 사용자 삭제
     @PostMapping("/home/user-details/{id}/delete")
-    public String deleteUser(@PathVariable("id") Long id) {
+    public String deleteUser(@PathVariable("id") Long id,HttpSession session) {
         userService.deleteUser(id);
-        return "redirect:/home/users";
+        session.invalidate();
+        return "redirect:/board/list";
     }
 
     // 사용자 수정
-    @PostMapping("/home/user-details/{id}/edit")
-    public String updateUser(@PathVariable("id") Long id, @ModelAttribute User user) {
+    @PostMapping("/home/user-update/{id}/edit")
+    public String updateUser(@PathVariable("id") Long id, @ModelAttribute User user, Model model) {
         user.setUserId(id);
         userService.updateUser(user);
-        return "redirect:/home/users";
+        model.addAttribute("comments",commentService.findCommentsByUserId(id));
+        model.addAttribute("posts",postService.findUserPosts(id));
+        return "redirect:/home/user-details/"+id;
+    }
+
+    // 사용자 수정 화면
+    @GetMapping("/home/user-update/{id}")
+    public String moveupdateUser(@PathVariable("id") Long id,Model model) {
+        model.addAttribute("user",userService.findUserByUserId(id));
+        return "/home/user-update";
     }
 
     // 특정 사용자 상세 정보 가져오기
@@ -73,8 +90,9 @@ public class UserController {
             model.addAttribute("error","로그인이 필요합니다.");
             return "redirect:/login";
         }
-
         if(loginUser.getUserId().equals(id)) {
+            model.addAttribute("comments",commentService.findCommentsByUserId(id));
+            model.addAttribute("posts",postService.findUserPosts(id));
             model.addAttribute("user", userService.findUserByUserId(id));
             return "/home/user-details";
         }else{
@@ -112,6 +130,7 @@ public class UserController {
         return "redirect:/login";  // 로그인 페이지로 리디렉션
     }
 }
+
 
 
 
