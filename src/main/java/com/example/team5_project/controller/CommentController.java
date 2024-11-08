@@ -78,12 +78,15 @@ public class CommentController {
                                 @RequestParam("boardId") Long boardId,
                                 RedirectAttributes redirectAttributes) {
 
-        User sessionUser = (User) session.getAttribute("user");
+    	// 세션에서 로그인된 사용자 정보 가져오기
+    	User sessionUser = (User) session.getAttribute("user");
 
-        if (sessionUser == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 삭제할 수 있습니다.");
-            return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
-        }
+    	// 로그인 여부 체크
+    	if (sessionUser == null) {
+    	    redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 댓글을 작성할 수 있습니다.");
+    	    return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+    	}
+
 
         Comment comment = commentService.findComment(commentId);
 
@@ -128,4 +131,5 @@ public class CommentController {
     }
 
 }
+
 
