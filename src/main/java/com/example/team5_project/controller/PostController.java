@@ -4,6 +4,7 @@ import com.example.team5_project.dto.PostDto;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.service.BoardService;
 import com.example.team5_project.service.PostService;
+import com.example.team5_project.service.UserService;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class PostController {
 
     @Autowired private PostService postService;
     @Autowired private BoardService boardService;
+    @Autowired private UserService userService;
     
   // 전체 게시글 리스트
   @GetMapping()
@@ -50,22 +52,26 @@ public class PostController {
     
     // 게시글 생성 페이지
     @GetMapping("/create")
-    public String createPostPage(Model model, Long boardId) {
+    public String createPostPage(Model model, Long boardId, @RequestParam("userId") Long userId, Post post) {
     	model.addAttribute("postDto", new PostDto());
         model.addAttribute("boardId", boardId);
-
+        
+        post.setUser(userService.findUserByUserId(userId));
+        
         return "home/posts-create";
     }
     
-    // 게시글 생성 페이지
+    // 게시글 생성
     @PostMapping("/create")
     public String createPost(PostDto postDto, 
     						 Long boardId, 
     						 @RequestParam("file") MultipartFile file,
+    						 @RequestParam("userId") Long userId,
     						 Model model, 
     						 RedirectAttributes redirect) throws IOException {
-
+    	
     	Post post = postDto.toPost();    	
+    	post.setUser(userService.findUserByUserId(userId));
     	Post newPost = postService.createPost(post, boardId,file);
     	
     	redirect.addAttribute("boardId", boardId);

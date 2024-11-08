@@ -1,8 +1,7 @@
 package com.example.team5_project.controller;
 
-import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.entity.User;
-
+import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.mapper.UserMapper;
 import com.example.team5_project.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -113,5 +112,6 @@ public class UserController {
         return "redirect:/login";  // 로그인 페이지로 리디렉션
     }
 }
+
 
 

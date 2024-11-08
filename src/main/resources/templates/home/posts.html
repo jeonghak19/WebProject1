@@ -2,12 +2,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
+<head th:replace="~{header :: head}"></head>
+
 <body>
+<div th:replace="~{navbar :: div}"></div>
+
 <div class="container">
     <h1 th:text="${boardTitle}"></h1>
 
@@ -49,11 +48,12 @@
         </tbody>
     </table>
     
-	<form action="/home/posts/create">
+	<form action="/home/posts/create" th:object="${post}">
+		<input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
 		<input type="hidden" name="boardId" th:value="${boardId}">
-		<button type="submit">게시글 작성</button>
+		 <button th:if="${session.user != null}" type="submit" class="btn btn-primary">게시글 작성</button>
 	</form>
-
+</div>
 	<form action="/board/list" method="get">
 		<button type="submit">게시판 목록</button>
 	</form>
@@ -63,6 +63,6 @@
 	<form th:action="@{/board/delete(boardId = ${boardId})}" method="post">
 		<button type="submit">게시판 삭제</button>
 	</form>
-	
+<div th:replace="~{footer :: footer}"></div>
 </body>
 </html>

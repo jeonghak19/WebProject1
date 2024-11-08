@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Details</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
+<head th:replace="~{header :: head}"></head>
+
 <body>
+<div th:replace="~{navbar :: div}"></div>
+
 <div class="container">
     <h1>Post Details</h1>
     <div>
@@ -29,7 +27,9 @@
 			<input type="hidden" name="postId" th:value="${post.postId}">
     		<button type="submit" class="btn btn-warning">게시글 수정</button>
 		</form>
-
+    </div>
 </div>
+<div th:replace="~{footer :: footer}"></div>
+
 </body>
 </html>
