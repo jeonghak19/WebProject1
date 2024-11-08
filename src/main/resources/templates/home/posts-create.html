@@ -7,6 +7,7 @@
 <body>
     <h2>Add New Post</h2>
     <form action="/home/posts/create" th:object="${postDto}" method="post" enctype="multipart/form-data">
+    	<input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
    	    <input type="hidden" name="boardId" th:value="${boardId}">
         <div class="form-group">
             <label for="title">Title</label>

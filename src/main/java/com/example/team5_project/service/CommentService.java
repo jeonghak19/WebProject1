@@ -39,7 +39,13 @@ public class CommentService {
         return commentRepository.findByPostPostIdOrderByCommentTimeDesc(postId);
     }
 
+    
+    
     public void deleteComment(Long commentId) {
         commentRepository.deleteById(commentId);
+    }
+
+    public Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
     }
 }

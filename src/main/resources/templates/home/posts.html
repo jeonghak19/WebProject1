@@ -1,13 +1,11 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
+<head th:replace="~{header :: head}"></head>
+
 <body>
+<div th:replace="~{navbar :: div}"></div>
+
 <div class="container">
     <h1 th:text="${boardTitle}"></h1>
 
@@ -38,10 +36,10 @@
             <td>
                 <a th:href="@{/home/posts/{postId}(postId=${post.postId}, boardId=${boardId})}" class="btn btn-info">View</a>
                 
-                <form action="/home/posts/delete" method="POST" style="display:inline;">
+                <form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/home/posts/delete" method="POST" style="display:inline;">
                 	<input type="hidden" name="postId" th:value="${post.postId}">
                 	<input type="hidden" name="boardId" th:value="${boardId}">
-                										
+
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>
@@ -49,20 +47,21 @@
         </tbody>
     </table>
     
-	<form action="/home/posts/create">
+	<form action="/home/posts/create" th:object="${post}">
+		<input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
 		<input type="hidden" name="boardId" th:value="${boardId}">
-		<button type="submit">게시글 작성</button>
+		 <button th:if="${session.user != null}" type="submit" class="btn btn-primary">게시글 작성</button>
 	</form>
-
+</div>
 	<form action="/board/list" method="get">
 		<button type="submit">게시판 목록</button>
 	</form>
-		<form th:action="@{/board/update/{boardId}(boardId= ${boardId})}">
+		<form th:if="${!session.isEmpty()}" th:action="@{/board/update/{boardId}(boardId= ${boardId})}">
 		<button type="submit">게시판 수정</button>
 	</form>
-	<form th:action="@{/board/delete(boardId = ${boardId})}" method="post">
+	<form th:if="${!session.isEmpty()}" th:action="@{/board/delete(boardId = ${boardId})}" method="post">
 		<button type="submit">게시판 삭제</button>
 	</form>
-	
+<div th:replace="~{footer :: footer}"></div>
 </body>
 </html>

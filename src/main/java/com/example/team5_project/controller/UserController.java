@@ -1,8 +1,7 @@
 package com.example.team5_project.controller;
 
-import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.entity.User;
-
+import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.mapper.UserMapper;
 import com.example.team5_project.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -67,7 +66,7 @@ public class UserController {
 
     // 특정 사용자 상세 정보 가져오기
     @GetMapping("/home/user-details/{id}")
-    public String getUser(@PathVariable Long id, Model model,HttpSession session) {
+    public String getUser(@PathVariable("id") Long id, Model model,HttpSession session) {
         User loginUser = (User) session.getAttribute("user");
 
         if(loginUser == null) {
@@ -92,7 +91,7 @@ public class UserController {
 
     // 로그인 처리
     @PostMapping("/login")
-    public String login(@RequestParam String name, @RequestParam String password, HttpSession session, Model model) {
+    public String login(@RequestParam("name") String name, @RequestParam("password") String password, HttpSession session, Model model) {
 
         User user = userService.findUserByName(name);
 
@@ -113,5 +112,6 @@ public class UserController {
         return "redirect:/login";  // 로그인 페이지로 리디렉션
     }
 }
+
 
 

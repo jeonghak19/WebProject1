@@ -1,9 +1,6 @@
 package com.example.team5_project.entity;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.annotations.ColumnDefault;
 
 import com.example.team5_project.baseEntity.BaseEntity;
@@ -37,9 +34,6 @@ public class Post extends BaseEntity {
     private Board board;
 
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
-    
     private String postTitle;
     private String description;
 //    private Integer postLike;

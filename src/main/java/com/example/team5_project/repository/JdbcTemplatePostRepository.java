@@ -1,9 +1,10 @@
 package com.example.team5_project.repository;
 
 
+import com.example.team5_project.entity.Board;
 import com.example.team5_project.entity.Post;
+import com.example.team5_project.entity.User;
 
-import org.hibernate.engine.jdbc.mutation.internal.PreparedStatementGroupStandard;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -17,15 +18,15 @@ import java.util.Optional;
 
 @Repository
 public class JdbcTemplatePostRepository implements PostRepository {
-	
-    private JdbcTemplate jdbcTemplate;
-    /*private UserRepository userRepository;*/
-    /*private BoardRepository boardRepository;*/
 
-    public JdbcTemplatePostRepository(JdbcTemplate jdbcTemplate /*, UserRepository userRepository ,BoardRepository boardRepository*/) {
+    private JdbcTemplate jdbcTemplate;
+    private UserRepository userRepository;
+    private BoardRepository boardRepository;
+
+    public JdbcTemplatePostRepository(JdbcTemplate jdbcTemplate,UserRepository userRepository,BoardRepository boardRepository) {
         this.jdbcTemplate = jdbcTemplate;
-        /*this.userRepository = userRepository;*/
-        /*this.boardRepository = boardRepository;*/
+        this.userRepository = userRepository;
+        this.boardRepository = boardRepository;
     }
 
     private final RowMapper<Post> postRowMapper = (rs, rowNum) -> {
@@ -40,11 +41,11 @@ public class JdbcTemplatePostRepository implements PostRepository {
         post.setCreatedAt(rs.getString("created_at"));
         post.setUpdatedAt(rs.getString("updated_at"));
 
-        /*Optional<User> user = userRepository.findById(rs.getLong("user_id"));
-        post.setUser(user.isPresent() ? user.get() : null);*/
+        Optional<User> user = userRepository.findById(rs.getLong("user_id"));
+        post.setUser(user.isPresent() ? user.get() : null);
 
-        /*Optional<Board> board = boardRepository.findById(rs.getLong("board_id"));
-        post.setBoard(board.isPresent() ? board.get() : null);*/
+        Optional<Board> board = boardRepository.findById(rs.getLong("board_id"));
+        post.setBoard(board.isPresent() ? board.get() : null);
 
         return post;
     };
@@ -58,20 +59,20 @@ public class JdbcTemplatePostRepository implements PostRepository {
     @Override
     public Post save(Post post, Long boardId) {
         if(post.getPostId()==null){
-            String sql = "INSERT INTO post (/*user_id,*/ post_title, description, /*post_like, post_dislike, */img_name, img_path, board_id) "
-            		+ "VALUES (/* ?, ?,*/?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO post (user_id, post_title, description, /*post_like, post_dislike, */img_name, img_path, board_id) "
+            		+ "VALUES (/* ?, ?,*/?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sql,new String[]{"post_id"});
-                //ps.setLong(1, post.getUser().getUserId());
-                ps.setString(1, post.getPostTitle());
-                ps.setString(2, post.getDescription());
+                ps.setLong(1, post.getUser().getUserId());
+                ps.setString(2, post.getPostTitle());
+                ps.setString(3, post.getDescription());
 //                ps.setInt(3, post.getPostLike());
 //                ps.setInt(4, post.getPostDislike());
-                ps.setString(3, post.getImgName());
-                ps.setString(4, post.getImgPath());
-                ps.setLong(5, boardId);
+                ps.setString(4, post.getImgName());
+                ps.setString(5, post.getImgPath());
+                ps.setLong(6, boardId);
 
                 return ps;
             },keyHolder);
@@ -128,3 +129,4 @@ public class JdbcTemplatePostRepository implements PostRepository {
         return posts;
     }
 }
+

@@ -5,6 +5,7 @@ import com.example.team5_project.entity.Post;
 import com.example.team5_project.service.BoardService;
 import com.example.team5_project.service.CommentService;
 import com.example.team5_project.service.PostService;
+import com.example.team5_project.service.UserService;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class PostController {
 
     @Autowired private PostService postService;
     @Autowired private BoardService boardService;
+    @Autowired private UserService userService;
     @Autowired private CommentService commentService;
     
   // 전체 게시글 리스트
@@ -40,37 +42,39 @@ public class PostController {
   }
   
   	// 게시글 상세 페이지
-  @GetMapping("/{postId}")
-  public String post(@PathVariable("postId") Long postId, 
-                     @RequestParam("boardId") Long boardId,
-                     Model model) {
-      Post post = postService.findPost(postId);
-      model.addAttribute("post", post);
-      model.addAttribute("boardId", boardId);
-      model.addAttribute("comments", commentService.findCommentsByPostId(postId));  // 추가된 부분
-
-      return "home/post-details";
-  }
-
-    
-    // 게시글 생성 페이지
-    @GetMapping("/create")
-    public String createPostPage(Model model, Long boardId) {
-    	model.addAttribute("postDto", new PostDto());
+    @GetMapping("/{postId}")
+    public String post(@PathVariable("postId") Long postId, 
+    				   @RequestParam("boardId") Long boardId,
+    				   Model model) {
+        model.addAttribute("post", postService.findPost(postId));
         model.addAttribute("boardId", boardId);
-
-        return "home/posts-create";
+        model.addAttribute("comments", commentService.findCommentsByPostId(postId)); 
+        
+        return "home/post-details";
     }
     
     // 게시글 생성 페이지
+    @GetMapping("/create")
+    public String createPostPage(Model model, Long boardId, @RequestParam("userId") Long userId, Post post) {
+    	model.addAttribute("postDto", new PostDto());
+        model.addAttribute("boardId", boardId);
+        
+        post.setUser(userService.findUserByUserId(userId));
+        
+        return "home/posts-create";
+    }
+    
+    // 게시글 생성
     @PostMapping("/create")
     public String createPost(PostDto postDto, 
     						 Long boardId, 
     						 @RequestParam("file") MultipartFile file,
+    						 @RequestParam("userId") Long userId,
     						 Model model, 
     						 RedirectAttributes redirect) throws IOException {
-
+    	
     	Post post = postDto.toPost();    	
+    	post.setUser(userService.findUserByUserId(userId));
     	Post newPost = postService.createPost(post, boardId,file);
     	
     	redirect.addAttribute("boardId", boardId);
