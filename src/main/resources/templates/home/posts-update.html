@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Post</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <h2>Update Post</h2>
+		<form action="/home/posts/update" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="boardId" th:value="${boardId}">
+			<input type="hidden" name="postId" th:value="${post.postId}">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" name="postTitle" id="title" required th:value="${post.postTitle}">
+        </div>
+   	    <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" class="form-control" name="description" id="description" th:value="${post.description}">
+        </div>
+
+        <div class="form-group">
+            <label for="file">Upload File</label>
+            <input type="file" class="form-control" name ="file" id="file" accept="image/png, image/jpeg"><br>
+        </div>
+        <button type="submit" class="btn btn-primary">수정완료</button>
+    </form>
+
+</body>
+</html>

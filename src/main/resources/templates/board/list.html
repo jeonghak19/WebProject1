@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+ <html  lang ="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Board List</title>
+</head>
+<body>
+<table>
+	<tr th:each="board : ${boards}">
+		<td>
+			<a th:href="@{/home/posts(boardId=${board.boardId})}" th:text="${board.boardTitle}"></a>
+		</td>
+	</tr>
+</table>
+	
+<form action="/board/create" method="get">
+	<button type="submit">게시판 생성</button>
+</form>
+</body>
+</html>
