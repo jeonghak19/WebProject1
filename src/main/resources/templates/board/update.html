@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+ <html  lang ="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Update Board</title>
+</head>
+<body>
+	<form th:action="@{/board/update(boardId= ${board.boardId})}"  method="post">
+		<textarea th:text="${board.boardTitle}" name="boardTitle" ></textarea>
+		<button type="submit">수정 완료</button>
+	</form>
+
+</body>
+</html>
