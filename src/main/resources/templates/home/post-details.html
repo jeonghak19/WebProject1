@@ -19,7 +19,6 @@
 		<a th:href="@{${post.imgPath}}" class="img-fluid">첨부파일</a>
 	</div>
         
- <!--        <img th:if="${post.imgName} !=null" th:href="@{${post.imgPath}" alt="Post Image" class="img-fluid"/> 이미지 경로 표시 -->
         <a th:href="@{/home/posts(boardId = ${boardId})}" class="btn btn-secondary">Back to Posts</a>
 
 		<form action="/home/posts/update">
@@ -27,8 +26,31 @@
 			<input type="hidden" name="postId" th:value="${post.postId}">
     		<button type="submit" class="btn btn-warning">게시글 수정</button>
 		</form>
+
+<!-- 댓글 리스트 -->
+        <div class="comment-list mt-4">
+            <div th:each="comment : ${comments}">
+                <div class="comment mb-3">
+                    <!-- 수정 및 삭제 버튼 -->
+                    <div th:if="${comment.user.userId == userId}">
+                        <form th:action="@{/home/posts/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                        </form>
+                        <a th:href="@{/home/posts/{postId}/comments/{commentId}/edit(postId=${post.postId}, commentId=${comment.commentId})}" class="btn btn-warning btn-sm">수정</a>
+                    </div>
+                    
+                    <!-- 댓글 작성자의 이름을 표시하는 부분 수정 -->
+                    <p><strong th:text="${comment.user.name}">User Name</strong> <span th:text="${comment.commentTime}">Time</span></p>
+                    <p th:text="${comment.content}">Content</p>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+
+
 <div th:replace="~{footer :: footer}"></div>
 
 </body>

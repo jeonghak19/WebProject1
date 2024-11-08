@@ -3,6 +3,7 @@ package com.example.team5_project.controller;
 import com.example.team5_project.dto.PostDto;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.service.BoardService;
+import com.example.team5_project.service.CommentService;
 import com.example.team5_project.service.PostService;
 import com.example.team5_project.service.UserService;
 
@@ -27,6 +28,7 @@ public class PostController {
     @Autowired private PostService postService;
     @Autowired private BoardService boardService;
     @Autowired private UserService userService;
+    @Autowired private CommentService commentService;
     
   // 전체 게시글 리스트
   @GetMapping()
@@ -46,7 +48,8 @@ public class PostController {
     				   Model model) {
         model.addAttribute("post", postService.findPost(postId));
         model.addAttribute("boardId", boardId);
-
+        model.addAttribute("comments", commentService.findCommentsByPostId(postId)); 
+        
         return "home/post-details";
     }
     
