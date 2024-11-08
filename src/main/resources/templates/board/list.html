@@ -17,7 +17,7 @@
 		</tr>
 	</table>
 	
-	<form action="/board/create" method="get">
+	<form th:if="${!session.isEmpty()}" action="/board/create" method="get">
 		<button type="submit">게시판 생성</button>
 	</form>
 	
