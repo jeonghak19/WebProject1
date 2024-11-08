@@ -2,6 +2,7 @@ package com.example.team5_project.controller;
 
 import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.entity.User;
+
 import com.example.team5_project.mapper.UserMapper;
 import com.example.team5_project.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -36,10 +37,10 @@ public class UserController {
         if (user == null) {
             User newUser = UserMapper.toEntity(userPostDto);
             userService.createUser(newUser);
-            return "redirect:/home/users";
+            return "redirect:/board/list";
         } else {
             model.addAttribute("error", "이미 존재하는 이름입니다.");
-            return "register";  // 실패 시 다시 로그인 페이지로 이동
+            return "register";  // 실패 시 다시 회원가입 페이지로 이동
         }
     }
 
@@ -98,7 +99,7 @@ public class UserController {
         // 사용자 존재 여부 및 비밀번호 확인
         if (user != null && password.equals(user.getPassword())) {
             session.setAttribute("user", user);
-            return "redirect:/home/users?loginSuccess=true"; // 로그인 성공 시 users
+            return "redirect:/board/list?loginSuccess=true"; // 로그인 성공 시 mainpage
         } else {
             model.addAttribute("error", "잘못된 이름 또는 비밀번호입니다.");
             return "login";  // 실패 시 다시 로그인 페이지로 이동
@@ -109,7 +110,8 @@ public class UserController {
     public String logout(HttpSession session,Model model) {
         session.invalidate();  // 세션 무효화하여 로그아웃 처리
         model.addAttribute("check", "로그아웃 되었습니다.");
-        return "redirect:/home/users";  // 로그인 페이지로 리디렉션
+        return "redirect:/login";  // 로그인 페이지로 리디렉션
     }
 }
+
 

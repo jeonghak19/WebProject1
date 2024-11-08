@@ -1,7 +1,6 @@
 package com.example.team5_project.dto;
 
 
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,4 +21,5 @@ public class UserResponseDto {
         this.attendance = attendance;
     }
 }
+
 

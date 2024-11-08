@@ -22,8 +22,9 @@
         <tr>
             <th>ID</th>
             <th>Title</th>
-            <th>Likes</th>
-            <th>Dislikes</th>
+            <th>Description</th>
+<!--             <th>Likes</th>
+            <th>Dislikes</th> -->
             <th>Actions</th>
         </tr>
         </thead>
@@ -31,13 +32,15 @@
         <tr th:each="post : ${posts}">
             <td th:text="${post.postId}"></td>
             <td th:text="${post.postTitle}"></td>
-            <td th:text="${post.postLike}"></td>
-            <td th:text="${post.postDislike}"></td>
+            <td th:text="${post.description}"></td>
+<!--             <td th:text="${post.postLike}"></td>
+            <td th:text="${post.postDislike}"></td> -->
             <td>
                 <a th:href="@{/home/posts/{postId}(postId=${post.postId}, boardId=${boardId})}" class="btn btn-info">View</a>
                 
-                <form th:action="@{/home/posts/delete(postId=${post.postId}, 
-                											boardId = ${boardId})}" method="POST" style="display:inline;">
+                <form action="/home/posts/delete" method="POST" style="display:inline;">
+                	<input type="hidden" name="postId" th:value="${post.postId}">
+                	<input type="hidden" name="boardId" th:value="${boardId}">
                 										
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
@@ -45,33 +48,16 @@
         </tr>
         </tbody>
     </table>
-
-    <h2>Add New Post</h2>
-    <form th:action="@{/home/posts(boardId =${boardId})}" method="post">
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" class="form-control" name="postTitle" id="title" required>
-        </div>
-        <div class="form-group">
-            <label for="likes">Likes</label>
-            <input type="number" class="form-control" name="postLike" id="likes" value="0" required>
-        </div>
-        <div class="form-group">
-            <label for="dislikes">Dislikes</label>
-            <input type="number" class="form-control" name="postDislike" id="dislikes" value="0" required>
-        </div>
-        <div class="form-group">
-            <label for="imgPath">Image Path</label>
-            <input type="text" class="form-control" name="imgPath" id="imgPath" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Create Post</button>
-    </form>
-</div>
+    
+	<form action="/home/posts/create">
+		<input type="hidden" name="boardId" th:value="${boardId}">
+		<button type="submit">게시글 작성</button>
+	</form>
 
 	<form action="/board/list" method="get">
 		<button type="submit">게시판 목록</button>
 	</form>
-		<form th:action="@{/board/update/{boardId}(boardId= ${boardId})}" method="get">
+		<form th:action="@{/board/update/{boardId}(boardId= ${boardId})}">
 		<button type="submit">게시판 수정</button>
 	</form>
 	<form th:action="@{/board/delete(boardId = ${boardId})}" method="post">

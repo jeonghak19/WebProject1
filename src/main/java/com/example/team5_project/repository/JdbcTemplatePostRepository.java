@@ -2,6 +2,8 @@ package com.example.team5_project.repository;
 
 
 import com.example.team5_project.entity.Post;
+
+import org.hibernate.engine.jdbc.mutation.internal.PreparedStatementGroupStandard;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -30,11 +32,13 @@ public class JdbcTemplatePostRepository implements PostRepository {
         Post post = new Post();
         post.setPostId(rs.getLong("post_id"));
         post.setPostTitle(rs.getString("post_title"));
-        post.setPostLike(rs.getInt("post_like"));
-        post.setPostDislike(rs.getInt("post_dislike"));
+        post.setDescription(rs.getString("description"));
+//        post.setPostLike(rs.getInt("post_like"));
+//        post.setPostDislike(rs.getInt("post_dislike"));
+        post.setImgName(rs.getString("img_name"));
         post.setImgPath(rs.getString("img_path"));
-        post.setCreatedAt(rs.getTimestamp("created_at"));
-        post.setUpdatedAt(rs.getTimestamp("updated_at"));
+        post.setCreatedAt(rs.getString("created_at"));
+        post.setUpdatedAt(rs.getString("updated_at"));
 
         /*Optional<User> user = userRepository.findById(rs.getLong("user_id"));
         post.setUser(user.isPresent() ? user.get() : null);*/
@@ -54,17 +58,21 @@ public class JdbcTemplatePostRepository implements PostRepository {
     @Override
     public Post save(Post post, Long boardId) {
         if(post.getPostId()==null){
-            String sql = "INSERT INTO post (/*user_id,*/ post_title, post_like, post_dislike,img_path, board_id) VALUES (/* ?,*/?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO post (/*user_id,*/ post_title, description, /*post_like, post_dislike, */img_name, img_path, board_id) "
+            		+ "VALUES (/* ?, ?,*/?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sql,new String[]{"post_id"});
                 //ps.setLong(1, post.getUser().getUserId());
                 ps.setString(1, post.getPostTitle());
-                ps.setInt(2, post.getPostLike());
-                ps.setInt(3, post.getPostDislike());
+                ps.setString(2, post.getDescription());
+//                ps.setInt(3, post.getPostLike());
+//                ps.setInt(4, post.getPostDislike());
+                ps.setString(3, post.getImgName());
                 ps.setString(4, post.getImgPath());
                 ps.setLong(5, boardId);
+
                 return ps;
             },keyHolder);
             Number key=keyHolder.getKey();
@@ -72,11 +80,14 @@ public class JdbcTemplatePostRepository implements PostRepository {
                 post.setPostId(key.longValue());
             }
         }else{
-            String sql = "UPDATE post SET post_title = ?, post_like = ?, post_dislike = ?, img_path = ? WHERE board_id = ? AND post_id = ?";
+            String sql = "UPDATE post SET post_title = ?, description =?, /*post_like = ?, post_dislike = ?,*/img_name=?, img_path = ? WHERE board_id = ?"
+            		+ " AND post_id = ?";
             jdbcTemplate.update(sql,
                     post.getPostTitle(),
-                    post.getPostLike(),
-                    post.getPostDislike(),
+                    post.getDescription(),
+//                    post.getPostLike(),
+//                    post.getPostDislike(),
+                    post.getImgName(),
                     post.getImgPath(),
                     boardId,
                     post.getPostId()

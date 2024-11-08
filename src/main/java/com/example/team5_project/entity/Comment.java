@@ -3,16 +3,21 @@ package com.example.team5_project.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
-@Data
+import com.example.team5_project.baseEntity.BaseEntity;
+
+
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long CommentId;
@@ -27,4 +32,5 @@ public class Comment {
 
     private String content;
     private Timestamp commentTime;
+
 }
