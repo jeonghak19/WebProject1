@@ -47,7 +47,11 @@ public class PostService {
 
     }
 
-    public Post createPost(Post post, Long boardId, MultipartFile file) throws IOException{
+    public Post createPost(Post post, Long boardId) {
+    	return postRepository.save(post, boardId);
+    }
+    
+    public void uploadFile(Post post, MultipartFile file) throws IOException {
     	String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
     	
     	UUID uuid = UUID.randomUUID();
@@ -58,7 +62,11 @@ public class PostService {
     	
     	post.setImgName(fileName);
     	post.setImgPath("/files/" + fileName);
-    	
+    }
+    
+    
+    public Post createPostWithFile(Post post, Long boardId, MultipartFile file) throws IOException{
+    	uploadFile(post, file);
     	
     	return postRepository.save(post, boardId);
     }

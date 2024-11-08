@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{header :: head}"></head>
+<head th:replace="~{header :: head}">
+	
+	
+</head>
 <body>
 <div th:replace="~{navbar :: div}"></div>
-
+<script type="text/javascript">
+		function changeFile(target) {
+	  		//setFile(e.target.file[0]);
+	  		//e.target.value = '';
+	  		var file = target.files[0];
+	  		document.getElementById("fileName").innerText = file.name;
+		}
+		function openFileDialog() {
+			document.getElementById("file").click();
+		}
+	</script>
     <h2>Update Post</h2>
 		<form action="/home/posts/update" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="boardId" th:value="${boardId}">
@@ -19,7 +32,9 @@
 
         <div class="form-group">
             <label for="file">Upload File</label>
-            <input type="file" class="form-control" name ="file" id="file" accept="image/png, image/jpeg"><br>
+            <button type="button" class="btn btn-primary" onclick="openFileDialog();">파일 선택</button>
+            <input type="file" onchange="changeFile(this);" style="display: none;" class="form-control" name ="file" id="file" accept="image/png, image/jpeg">
+            <span id="fileName" th:text=${imgName}></span><br>
         </div>
         <button type="submit" class="btn btn-primary">수정완료</button>
     </form>

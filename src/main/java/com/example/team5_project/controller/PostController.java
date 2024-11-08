@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import javax.lang.model.element.ModuleElement;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,7 +50,15 @@ public class PostController {
     				   Model model) {
         model.addAttribute("post", postService.findPost(postId));
         model.addAttribute("boardId", boardId);
-        model.addAttribute("comments", commentService.findCommentsByPostId(postId)); 
+        model.addAttribute("comments", commentService.findCommentsByPostId(postId));
+        
+        String imgName = null;
+        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
+  
+            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
+            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
+            model.addAttribute("imgName", imgName);
+        }
         
         return "home/post-details";
     }
@@ -68,22 +78,33 @@ public class PostController {
     @PostMapping("/create")
     public String createPost(PostDto postDto, 
     						 Long boardId, 
-    						 @RequestParam("file") MultipartFile file,
+    						 MultipartFile file,
     						 @RequestParam("userId") Long userId,
     						 Model model, 
     						 RedirectAttributes redirect) throws IOException {
     	
     	Post post = postDto.toPost();    	
     	post.setUser(userService.findUserByUserId(userId));
-    	Post newPost = postService.createPost(post, boardId,file);
+    	
+    	if(file == null) {
+    		Post newPost = postService.createPost(post, boardId);
+    		
+        	if(newPost == null) {
+        		return "redirect:/home/posts/create";
+        	}   
+    	} else {
+    		Post newPost = postService.createPostWithFile(post, boardId,file);
+    		
+        	if(newPost == null) {
+        		return "redirect:/home/posts/create";
+        	}     
+    	}
     	
     	redirect.addAttribute("boardId", boardId);
-    	
-    	if(newPost == null) {
-    		return "redirect:/home/posts/create";
-    	}        
+  
         return "redirect:/home/posts";
     }
+
     
     
     // 게시글 수정 페이지
@@ -92,6 +113,15 @@ public class PostController {
 
     	model.addAttribute("post", postService.findPost(postId));
     	model.addAttribute("boardId", boardId);
+    	
+        String imgName = null;
+        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
+  
+            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
+            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
+            model.addAttribute("imgName", imgName);
+        }
+    	
 
     	return "home/posts-update";
     }   
@@ -102,21 +132,18 @@ public class PostController {
     public String updatePost(Long postId, Long boardId, 
     						 Post post, 
     						 RedirectAttributes redirect, 
-    						 @RequestParam("file") MultipartFile file) throws IOException { 	
-    	String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
+    						 MultipartFile file) throws IOException { 	
+
+    	if(file == null) {
+    		postService.updatePost(post, boardId);
+        	redirect.addAttribute("boardId", boardId);
+    	} else {
+    		postService.uploadFile(post, file);
+    		
+    		postService.updatePost(post, boardId);
+        	redirect.addAttribute("boardId", boardId);
+    	}
     	
-    	UUID uuid = UUID.randomUUID();
-    	String fileName = uuid + "_" + file.getOriginalFilename();
-    	
-    	File saveFile = new File(projectPath, fileName);
-    	file.transferTo(saveFile);
-    	
-    	post.setImgName(fileName);
-    	post.setImgPath("/files/" + fileName);
-    	
-    	
-    	redirect.addAttribute("boardId", boardId);
-    	postService.updatePost(post, boardId);
        
         return "redirect:/home/posts";
     }
