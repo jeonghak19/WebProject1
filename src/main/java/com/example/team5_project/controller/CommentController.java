@@ -1,12 +1,16 @@
 package com.example.team5_project.controller;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -101,33 +105,27 @@ public class CommentController {
         return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
     }
 
-    // 댓글 수정
+ // 댓글 수정
     @PostMapping("/{postId}/comments/{commentId}/edit")
-    public String editComment(@PathVariable("postId") Long postId, 
-                              @PathVariable("commentId") Long commentId, 
-                              @RequestParam("content") String content,
-                              @RequestParam("boardId") Long boardId,
-                              RedirectAttributes redirectAttributes) {
-
+    public ResponseEntity<Map<String, Object>> editComment(@PathVariable("postId") Long postId,
+                                                           @PathVariable("commentId") Long commentId,
+                                                           @RequestBody Map<String, String> contentMap) {
         User sessionUser = (User) session.getAttribute("user");
 
         if (sessionUser == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 댓글을 수정할 수 있습니다.");
-            return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "로그인 후 댓글을 수정할 수 있습니다."));
         }
 
         Comment comment = commentService.findComment(commentId);
 
         if (!comment.getUser().getUserId().equals(sessionUser.getUserId())) {
-            redirectAttributes.addFlashAttribute("errorMessage", "수정 권한이 없습니다.");
-            return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("success", false, "message", "수정 권한이 없습니다."));
         }
 
-        comment.setContent(content);
-        commentService.saveComment(comment, sessionUser.getUserId(), postId);  // 수정된 댓글 저장
+        comment.setContent(contentMap.get("content"));
+        commentService.saveComment(comment, sessionUser.getUserId(), postId);
 
-        redirectAttributes.addFlashAttribute("message", "댓글이 수정되었습니다.");
-        return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+        return ResponseEntity.ok(Map.of("success", true, "message", "댓글이 수정되었습니다."));
     }
 
 }
