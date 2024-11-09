@@ -31,6 +31,7 @@ public class PostPageController {
                               @RequestParam(defaultValue = "") String searchTitle,
                               @RequestParam(defaultValue = "0") int page,
                               Model model) {
+
         int pageSize = 10; // 한 페이지에 보여줄 게시물 개수
         Pageable pageable = PageRequest.of(page, pageSize);
 

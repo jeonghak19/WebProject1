@@ -20,7 +20,7 @@
     </form>
 
     <h2>작성한 게시물</h2>
-    <table th:if="${posts!=null}" class="table">
+    <table th:if="${postsPage != null}" class="table">
         <thead>
         <tr>
             <th>Id</th>
@@ -30,14 +30,36 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="post : ${posts}">
+        <tr th:each="post : ${postsPage.content}">
             <td th:text="${post.postId}"></td>
             <td th:text="${post.postTitle}"></td>
             <td th:text="${post.createdAt}"></td>
-            <td><a th:href="@{/home/posts/{postId}(postId=${post.postId},boardId=${post.board.boardId})}" class="btn btn-info">게시물 보러 가기</a></td>
+            <td>
+                <a th:href="@{/home/posts/{postId}(postId=${post.postId},boardId=${post.board.boardId})}" class="btn btn-info">게시물 보러 가기</a>
+            </td>
         </tr>
         </tbody>
     </table>
+
+    <!-- 페이지네이션 -->
+    <nav th:if="${postsPage.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <!-- 이전 페이지 버튼 -->
+            <li th:classappend="${postsPage.hasPrevious()} ? '' : 'disabled'" class="page-item">
+                <a th:href="@{/home/user-details/{userId}(userId=${user.userId},page=${postsPage.number > 0 ? postsPage.number - 1 : 0})}" class="page-link">Previous</a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li th:each="i : ${#numbers.sequence(0, postsPage.totalPages - 1)}" th:classappend="${i == postsPage.number} ? 'active'" class="page-item">
+                <a th:href="@{/home/user-details/{userId}(userId=${user.userId},page=${i})}" th:text="${i + 1}" class="page-link"></a>
+            </li>
+
+            <!-- 다음 페이지 버튼 -->
+            <li th:classappend="${postsPage.hasNext()} ? '' : 'disabled'" class="page-item">
+                <a th:href="@{/home/user-details/{userId}(userId=${user.userId},page=${postsPage.number + 1 < postsPage.totalPages ? postsPage.number + 1 : postsPage.totalPages - 1})}" class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
 
     <h2>작성한 댓글</h2>
     <table th:if="${comments!=null}" class="table">

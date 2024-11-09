@@ -17,7 +17,12 @@ public class PostPageService {
     public Page<Post> getPostPageByBoardId(Long boardId, Pageable pageable) {
         return postPageRepository.findByBoard_BoardId(boardId,pageable);
     }
+
     public Page<Post> getPostPageByTitle(String title, Long boardId, Pageable pageable) {
         return postPageRepository.findByPostTitleContainingAndBoard_BoardId(title,boardId,pageable);
+    }
+
+    public Page<Post> getPostPageByUser(Long userId, Pageable pageable) {
+        return postPageRepository.findByUser_UserId(userId,pageable);
     }
 }
