@@ -12,7 +12,7 @@
 	<table class="table">
 		<tr th:each="board : ${boards}">
 			<td>
-				<a th:href="@{/home/posts(boardId=${board.boardId})}" th:text="${board.boardTitle}"></a>
+				<a th:href="@{/home/posts/search(boardId=${board.boardId})}" th:text="${board.boardTitle}"></a>
 			</td>
 		</tr>
 	</table>

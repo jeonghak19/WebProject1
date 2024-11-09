@@ -31,14 +31,12 @@ public class CommentController {
     
     private final CommentService commentService;
     private final PostService postService;
-    private final UserService userService;
     private final HttpSession session;
 
     @Autowired
-    public CommentController(CommentService commentService, PostService postService, UserService userService, HttpSession session) {
+    public CommentController(CommentService commentService, PostService postService, HttpSession session) {
         this.commentService = commentService;
         this.postService = postService;
-        this.userService = userService;
         this.session = session;
     }
 

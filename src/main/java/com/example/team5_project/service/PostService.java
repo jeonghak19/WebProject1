@@ -32,20 +32,20 @@ public class PostService {
                 .orElseThrow(()->new RuntimeException("해당 ID를 가진 게시물이 없습니다."));
     }
 
-    public List<Post> findPostByBoardId(Long boardId){
+    /*public List<Post> findPostByBoardId(Long boardId){
         return postRepository.findByBoardId(boardId);
 
-    }
+    }*/
 
     public List<Post> findUserPosts(Long userId){
         return postRepository.findByUserId(userId);
 
     }
 
-    public List<Post> findSearchPost(String title,Long boardId){
+    /*public List<Post> findSearchPost(String title,Long boardId){
         return postRepository.findByTitle(title,boardId);
 
-    }
+    }*/
 
     public Post createPost(Post post, Long boardId) {
     	return postRepository.save(post, boardId);

@@ -21,7 +21,7 @@
         </div>
 
 
-        <a th:href="@{/home/posts(boardId = ${boardId})}" class="btn btn-secondary">Back to Posts</a>
+        <a th:href="@{/home/posts/search(boardId = ${boardId})}" class="btn btn-secondary">Back to Posts</a>
 
         <form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/home/posts/update">
             <input type="hidden" name="boardId" th:value="${boardId}">

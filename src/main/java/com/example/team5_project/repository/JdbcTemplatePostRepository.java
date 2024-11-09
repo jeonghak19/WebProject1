@@ -106,13 +106,13 @@ public class JdbcTemplatePostRepository implements PostRepository {
         jdbcTemplate.update(sql, post.getPostId());
     }
 
-    @Override
+   /* @Override
     public List<Post> findByBoardId(Long boardId) {
         String sql = "SELECT * FROM post WHERE board_id = ?";
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{boardId}, postRowMapper);
 
         return posts;
-    }
+    }*/
 
     @Override
     public List<Post> findByUserId(Long userId) {
@@ -122,7 +122,7 @@ public class JdbcTemplatePostRepository implements PostRepository {
         return posts;
     }
 
-    @Override
+    /*@Override
     public List<Post> findByTitle(String title,Long boardId) {
         String sql = "SELECT * FROM post WHERE post_title LIKE ? and board_id = ?";
         String searchTitle = "%" + title + "%";
@@ -130,6 +130,6 @@ public class JdbcTemplatePostRepository implements PostRepository {
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{searchTitle,boardId}, postRowMapper);
 
         return posts;
-    }
+    }*/
 }
 

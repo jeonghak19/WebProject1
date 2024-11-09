@@ -28,17 +28,6 @@ public class PostController {
     @Autowired private BoardService boardService;
     @Autowired private UserService userService;
     @Autowired private CommentService commentService;
-    
-  // 전체 게시글 리스트
-  @GetMapping()
-  public String posts(Model model, @RequestParam("boardId") Long boardId) {
-      
-	  model.addAttribute("posts", postService.findPostByBoardId(boardId));
-	  model.addAttribute("boardTitle", boardService.getBoardTitle(boardId));
-      model.addAttribute("boardId", boardId);
- 
-      return "home/posts";
-  }
   
   	// 게시글 상세 페이지
     @GetMapping("/{postId}")
@@ -99,7 +88,7 @@ public class PostController {
     	
     	redirect.addAttribute("boardId", boardId);
   
-        return "redirect:/home/posts";
+        return "redirect:/home/posts/search";
     }
 
     
@@ -142,7 +131,7 @@ public class PostController {
     	}
     	
        
-        return "redirect:/home/posts";
+        return "redirect:/home/posts/search";
     }
     
     // 게시글 삭제
@@ -152,21 +141,7 @@ public class PostController {
     	postService.deletePost(postId);
         redirect.addAttribute("boardId", boardId);
 
-        return "redirect:/home/posts";
-    }
-
-    @GetMapping("/search")
-    public String searchPosts(@RequestParam("boardId") Long boardId,
-                              @RequestParam("searchTitle") String searchTitle,
-                              Model model) {
-        model.addAttribute("boardTitle", boardService.getBoardTitle(boardId));
-        model.addAttribute("boardId", boardId);
-        if(searchTitle.equals("")){
-            model.addAttribute("posts", postService.findPostByBoardId(boardId));
-        }else{
-            model.addAttribute("posts", postService.findSearchPost(searchTitle,boardId));
-        }
-        return "home/posts"; // 기존 페이지와 동일하게 렌더링
+        return "redirect:/home/posts/search";
     }
 
 }

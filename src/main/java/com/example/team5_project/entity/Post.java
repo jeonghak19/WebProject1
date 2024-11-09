@@ -33,7 +33,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name="board_id", nullable=false)
     private Board board;
 
-
+    @Column(name="post_title")
     private String postTitle;
     private String description;
 //    private Integer postLike;
