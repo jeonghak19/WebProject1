@@ -1,7 +1,5 @@
 package com.example.team5_project.repository;
 
-
-
 import com.example.team5_project.entity.Board;
 import com.example.team5_project.entity.Post;
 import org.springframework.jdbc.core.JdbcTemplate;

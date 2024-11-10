@@ -25,29 +25,33 @@ public class PostService {
         this.postRepository = postRepository;
     }
 
-    
+
     public Post findPost(Long postId){
 
         return postRepository.findById(postId)
                 .orElseThrow(()->new RuntimeException("해당 ID를 가진 게시물이 없습니다."));
     }
 
-    public List<Post> findPostByBoardId(Long boardId){
+    /*public List<Post> findPostByBoardId(Long boardId){
         return postRepository.findByBoardId(boardId);
 
-    }
+    }*/
 
     public List<Post> findUserPosts(Long userId){
         return postRepository.findByUserId(userId);
 
     }
 
-    public List<Post> findSearchPost(String title){
-        return postRepository.findByTitle(title);
+    /*public List<Post> findSearchPost(String title,Long boardId){
+        return postRepository.findByTitle(title,boardId);
 
+    }*/
+
+    public Post createPost(Post post, Long boardId) {
+    	return postRepository.save(post, boardId);
     }
-
-    public Post createPost(Post post, Long boardId, MultipartFile file) throws IOException{
+    
+    public void uploadFile(Post post, MultipartFile file) throws IOException {
     	String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
     	
     	UUID uuid = UUID.randomUUID();
@@ -58,7 +62,11 @@ public class PostService {
     	
     	post.setImgName(fileName);
     	post.setImgPath("/files/" + fileName);
-    	
+    }
+    
+    
+    public Post createPostWithFile(Post post, Long boardId, MultipartFile file) throws IOException{
+    	uploadFile(post, file);
     	
     	return postRepository.save(post, boardId);
     }
@@ -89,3 +97,5 @@ public class PostService {
     }   
 
 }
+
+

@@ -31,14 +31,12 @@ public class CommentController {
     
     private final CommentService commentService;
     private final PostService postService;
-    private final UserService userService;
     private final HttpSession session;
 
     @Autowired
-    public CommentController(CommentService commentService, PostService postService, UserService userService, HttpSession session) {
+    public CommentController(CommentService commentService, PostService postService, HttpSession session) {
         this.commentService = commentService;
         this.postService = postService;
-        this.userService = userService;
         this.session = session;
     }
 
@@ -49,33 +47,26 @@ public class CommentController {
                               @RequestParam("boardId") Long boardId,
                               RedirectAttributes redirectAttributes) {
         
-        // 세션에서 로그인된 사용자 정보 가져오기
         User sessionUser = (User) session.getAttribute("user");
         
-        // 로그인 여부 체크
         if (sessionUser == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 댓글을 작성할 수 있습니다.");
             return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
         }
 
-        // Post 객체 조회
         Post post = postService.findPost(postId);
-        
-        // Comment 객체 생성 및 설정
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setUser(sessionUser);  // 세션에서 가져온 사용자 설정
-        comment.setContent(content);
-        comment.setCommentTime(new Timestamp(System.currentTimeMillis()));
 
-        // 댓글 저장
+        // 생성자를 통해 Comment 객체 생성
+        Comment comment = new Comment(post, sessionUser, content, new Timestamp(System.currentTimeMillis()));
+
         commentService.saveComment(comment, sessionUser.getUserId(), postId);
 
         redirectAttributes.addFlashAttribute("message", "댓글이 작성되었습니다.");
         return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
     }
+
     
- // 댓글 삭제
+    // 댓글 삭제
     @PostMapping("/{postId}/comments/{commentId}/delete")
     public String deleteComment(@PathVariable("postId") Long postId, 
                                 @PathVariable("commentId") Long commentId, 
@@ -105,7 +96,7 @@ public class CommentController {
         return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
     }
 
- // 댓글 수정
+    // 댓글 수정
     @PostMapping("/{postId}/comments/{commentId}/edit")
     public ResponseEntity<Map<String, Object>> editComment(@PathVariable("postId") Long postId,
                                                            @PathVariable("commentId") Long commentId,
@@ -129,5 +120,3 @@ public class CommentController {
     }
 
 }
-
-

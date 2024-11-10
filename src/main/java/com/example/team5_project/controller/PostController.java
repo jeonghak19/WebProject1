@@ -1,17 +1,19 @@
 package com.example.team5_project.controller;
 
 import com.example.team5_project.dto.PostDto;
+import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.service.BoardService;
+import com.example.team5_project.service.CommentPageService;
 import com.example.team5_project.service.CommentService;
 import com.example.team5_project.service.PostService;
 import com.example.team5_project.service.UserService;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,27 +31,33 @@ public class PostController {
     @Autowired private BoardService boardService;
     @Autowired private UserService userService;
     @Autowired private CommentService commentService;
-    
-  // 전체 게시글 리스트
-  @GetMapping()
-  public String posts(Model model, @RequestParam("boardId") Long boardId) {
-      
-	  model.addAttribute("posts", postService.findPostByBoardId(boardId));
-	  model.addAttribute("boardTitle", boardService.getBoardTitle(boardId));
-      model.addAttribute("boardId", boardId);
- 
-      return "home/posts";
-  }
+    @Autowired private CommentPageService commentPageService;
+
   
-  	// 게시글 상세 페이지
     @GetMapping("/{postId}")
-    public String post(@PathVariable("postId") Long postId, 
-    				   @RequestParam("boardId") Long boardId,
-    				   Model model) {
+    public String post(@PathVariable("postId") Long postId,
+                       @RequestParam("boardId") Long boardId,
+                       @RequestParam(value = "page", defaultValue = "0") int page,
+                       @RequestParam(value = "size", defaultValue = "10") int size,
+                       @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder,
+                       Model model) {
+
         model.addAttribute("post", postService.findPost(postId));
         model.addAttribute("boardId", boardId);
-        model.addAttribute("comments", commentService.findCommentsByPostId(postId)); 
-        
+
+        // 댓글 페이지네이션 처리
+        Page<Comment> commentsPage = commentPageService.getCommentsByPostId(postId, page, size, sortOrder);
+        model.addAttribute("comments", commentsPage.getContent());
+        model.addAttribute("totalPages", commentsPage.getTotalPages());
+        model.addAttribute("currentPage", page);
+
+        String imgName = null;
+        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
+            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
+            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
+            model.addAttribute("imgName", imgName);
+        }
+
         return "home/post-details";
     }
     
@@ -68,22 +76,33 @@ public class PostController {
     @PostMapping("/create")
     public String createPost(PostDto postDto, 
     						 Long boardId, 
-    						 @RequestParam("file") MultipartFile file,
+    						 MultipartFile file,
     						 @RequestParam("userId") Long userId,
     						 Model model, 
     						 RedirectAttributes redirect) throws IOException {
     	
     	Post post = postDto.toPost();    	
     	post.setUser(userService.findUserByUserId(userId));
-    	Post newPost = postService.createPost(post, boardId,file);
+    	
+    	if(file == null) {
+    		Post newPost = postService.createPost(post, boardId);
+    		
+        	if(newPost == null) {
+        		return "redirect:/home/posts/create";
+        	}   
+    	} else {
+    		Post newPost = postService.createPostWithFile(post, boardId,file);
+    		
+        	if(newPost == null) {
+        		return "redirect:/home/posts/create";
+        	}     
+    	}
     	
     	redirect.addAttribute("boardId", boardId);
-    	
-    	if(newPost == null) {
-    		return "redirect:/home/posts/create";
-    	}        
-        return "redirect:/home/posts";
+  
+        return "redirect:/home/posts/search";
     }
+
     
     
     // 게시글 수정 페이지
@@ -92,6 +111,15 @@ public class PostController {
 
     	model.addAttribute("post", postService.findPost(postId));
     	model.addAttribute("boardId", boardId);
+    	
+        String imgName = null;
+        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
+  
+            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
+            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
+            model.addAttribute("imgName", imgName);
+        }
+    	
 
     	return "home/posts-update";
     }   
@@ -102,23 +130,20 @@ public class PostController {
     public String updatePost(Long postId, Long boardId, 
     						 Post post, 
     						 RedirectAttributes redirect, 
-    						 @RequestParam("file") MultipartFile file) throws IOException { 	
-    	String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
+    						 MultipartFile file) throws IOException { 	
+
+    	if(file == null) {
+    		postService.updatePost(post, boardId);
+        	redirect.addAttribute("boardId", boardId);
+    	} else {
+    		postService.uploadFile(post, file);
+    		
+    		postService.updatePost(post, boardId);
+        	redirect.addAttribute("boardId", boardId);
+    	}
     	
-    	UUID uuid = UUID.randomUUID();
-    	String fileName = uuid + "_" + file.getOriginalFilename();
-    	
-    	File saveFile = new File(projectPath, fileName);
-    	file.transferTo(saveFile);
-    	
-    	post.setImgName(fileName);
-    	post.setImgPath("/files/" + fileName);
-    	
-    	
-    	redirect.addAttribute("boardId", boardId);
-    	postService.updatePost(post, boardId);
        
-        return "redirect:/home/posts";
+        return "redirect:/home/posts/search";
     }
     
     // 게시글 삭제
@@ -128,6 +153,7 @@ public class PostController {
     	postService.deletePost(postId);
         redirect.addAttribute("boardId", boardId);
 
-        return "redirect:/home/posts";
+        return "redirect:/home/posts/search";
     }
+
 }
