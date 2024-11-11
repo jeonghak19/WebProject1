@@ -39,3 +39,4 @@ out/
 ### Maven ###
 /target/
 /pom.xml
+/build.gradle
