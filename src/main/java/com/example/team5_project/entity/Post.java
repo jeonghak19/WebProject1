@@ -60,4 +60,13 @@ public class Post extends BaseEntity {
     			.imgPath(imgPath)
     			.build();
     }
+    
+    public void updateCount(boolean liked) {
+    	if(liked) {
+    		likeCount +=1;
+    		
+    	} else {
+    		likeCount -=1;
+    	}
+    }
 }

@@ -4,24 +4,30 @@ import com.example.team5_project.dto.PostDto;
 import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
-import com.example.team5_project.service.*;
+import com.example.team5_project.service.CommentPageService;
+import com.example.team5_project.service.CommentService;
+import com.example.team5_project.service.LikesService;
+import com.example.team5_project.service.PostService;
+import com.example.team5_project.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -30,22 +36,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class PostController {
 
+    @Autowired private PostService postService;
+    @Autowired private UserService userService;
+    @Autowired private LikesService likesService;
+    @Autowired private CommentPageService commentPageService;
+    
+    private final Map<Long, Set<Long>> likeMap = new HashMap<>();
     private final Map<Long, Set<Long>> userViewRecords = new ConcurrentHashMap<>();
-
-    private final PostService postService;
-    private final UserService userService;
-    private final LikesService likesService;
-    private final CommentPageService commentPageService;
-
-    public PostController(PostService postService,
-                          UserService userService,
-                          LikesService likesService,
-                          CommentPageService commentPageService) {
-        this.postService = postService;
-        this.userService = userService;
-        this.likesService = likesService;
-        this.commentPageService = commentPageService;
-    }
+    private final Map<Long, Long> likeCountMap = new HashMap<>();
+    
   	// 게시글 상세 페이지
     @GetMapping("/{postId}")
     public String post(@PathVariable("postId") Long postId, 
@@ -56,22 +55,37 @@ public class PostController {
     				   Model model,  
     				   HttpSession session) {
 
-        User user = (User) session.getAttribute("user");
-
-        if (user != null) {
+        Post post = postService.findPost(postId);
+        postService.increaseViewCount(postId);
+    	
+        User user = (User)session.getAttribute("user");
+        boolean liked = false;
+        
+        if(user != null) {
+        //	liked = likesService.getLike(postId, user.getUserId());
+   		
             // 사용자 ID를 키로 하는 조회 기록을 가져옴 - 존재하지 않을 경우 추가
-            Set<Long> viewedPosts = userViewRecords.computeIfAbsent(user.getUserId(), k -> new HashSet<>());
-
+            Set<Long> viewedPosts = userViewRecords.computeIfAbsent(user.getUserId(), k -> new HashSet<>());        	
+        	Set<Long> postIdSet = likeMap.computeIfAbsent(user.getUserId(), k -> new HashSet<Long>());
+        	
+        	
             // 사용자가 현재 게시물을 조회한 적이 없다면 조회수 증가
             if (!viewedPosts.contains(postId)) {
                 postService.visitPost(postId);  // 조회수 증가 메소드 호출
                 viewedPosts.add(postId);  // 현재 게시물 ID를 사용자 조회 기록에 추가
                 log.info("최초 방문");
-            }
-        }
+            }        	
+        	
+            // 사용자가 현재 게시물을 좋아요 했는 지 확인
+        	if(postIdSet.contains(postId)) {
+         		liked = true;
+         	} else {    
+         		liked =  false;
+     		}      
+        	
+        	model.addAttribute("session.user", user);
+     	}
 
-        Post post = postService.findPost(postId);
-        postService.increaseViewCount(postId);
         // 댓글 페이지네이션 처리
         Page<Comment> commentsPage = commentPageService.getCommentsByPostId(postId, page, size, sortOrder);
         model.addAttribute("comments", commentsPage.getContent());
@@ -86,17 +100,17 @@ public class PostController {
         }
         model.addAttribute("post", post);
         model.addAttribute("boardId", boardId);
-        model.addAttribute("imgName", postService.getOriginalFileName(postId));
-        
-
-        boolean liked = false;
-        
-        if(user != null) {
-        	liked = likesService.getLike(postId, user.getUserId());
-        }
+        model.addAttribute("imgName", postService.getOriginalFileName(postId));     
         model.addAttribute("liked", liked);
-        model.addAttribute("likeCount", post.getLikeCount());
         
+        
+        Post newPost = postService.findPost(postId);
+      //  model.addAttribute("likeCount", post.getLikeCount());
+        System.out.println("게시글 상세 페이지 이동 전 현재 liked상태: " + liked);
+        System.out.println("게시글 상세 페이지 이동 전 현재 likeCount: " + newPost.getLikeCount());
+        System.out.println("게시글 상세 페이지 이동 전 현재 postId: " +postId);
+        System.out.println("게시글 상세 페이지 이동 전 현재 userId: " +post.getUser().getUserId());       
+           
         return "home/post-details";
     }
     
@@ -182,4 +196,57 @@ public class PostController {
 
         return "redirect:/home/posts/search";
     }
+    
+    // 좋아요 버튼 눌렀을 때
+    @PostMapping("/like")
+    @ResponseBody
+    public Map<String, Object> clickLike(@RequestBody Map<String, Long> requestData) {
+    	Long postId = requestData.get("postId");
+	    Long userId = requestData.get("userId");
+	    
+    	Map<String, Object> response = new HashMap<>();
+
+	    boolean liked = false;        
+    
+        Post post = postService.findPost(postId);
+	    User user = userService.findUserByUserId(userId);
+
+//	    if (likesService.getLike(postId, userId)) {
+//	        likesService.deleteLike(postId, userId);
+//	        System.out.println("like 컨트롤러 삭제쪽 현재 likeCount: " +post.getLikeCount());
+//
+//	        liked = false;
+//	       // postService.updateCount(post, liked);
+//	        postService.updatePost(post, userId);
+//	        System.out.println("좋아요 취소 후 likeCount: " + post.getLikeCount());
+//	        
+//	    } else {
+//	        likesService.addLike(post, user);
+//	        System.out.println("like 컨트롤러 추가 쪽 현재 likeCount: " +post.getLikeCount());
+//
+//	        liked = true;
+//	        //postService.updateCount(post, liked);
+//	        postService.updatePost(post, userId);
+//	        System.out.println("좋아요 누른 후 likeCount: " + post.getLikeCount());
+//	    }
+
+	    	if(likeMap.get(userId).contains(postId)) {
+	    		likeMap.get(userId).remove(postId);
+	    		liked = false;
+	    		
+	    		postService.updateCount(post, liked);
+	    		
+	    	} else {
+	    		likeMap.get(userId).add(postId);
+	    		liked = true;
+	    		
+	    		postService.updateCount(post, liked);
+	    }
+	    
+		response.put("liked", liked);
+		//response.put("likeCount", post.getLikeCount());
+		response.put("post", post);
+		return response;
+	}
+    
 }

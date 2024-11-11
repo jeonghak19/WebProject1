@@ -7,6 +7,7 @@ import com.example.team5_project.entity.Post;
 import com.example.team5_project.repository.PostRepository;
 
 import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
@@ -97,7 +98,7 @@ public class PostService {
             return originalFileName;
     }    
     
-    
+    @Transactional
     public Post updatePost(Post post, Long boardId) {
         Post findpost = postRepository.findById(post.getPostId())
                 .orElseThrow(()->new RuntimeException());
@@ -120,10 +121,15 @@ public class PostService {
     public void deletePost(Long postId){
         Post post = findPost(postId);
         postRepository.delete(post);
-    }
-
+    } 
+    
     @Transactional
     public void visitPost(Long postId){
         postRepository.increasePostViewCount(postId);
+    }
+
+    public void updateCount(Post post, boolean liked) {
+    	postRepository.updateCount(post, liked);
+    	post.updateCount(liked);
     }
 }
