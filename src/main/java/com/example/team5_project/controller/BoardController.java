@@ -56,7 +56,7 @@ public class BoardController {
 	public String updateBoard(Board board, RedirectAttributes redirect) {
 		boardService.updateBoard(board);		
 		redirect.addAttribute("boardId", board.getBoardId());
-
+		
 		return "redirect:/home/posts/search";
 	}	
 	
@@ -69,5 +69,6 @@ public class BoardController {
 		return "redirect:/board/list";
 	}
 }
+
 
 

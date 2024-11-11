@@ -1,6 +1,5 @@
 package com.example.team5_project.dto;
 
-
 import com.example.team5_project.entity.Board;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;

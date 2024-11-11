@@ -3,22 +3,25 @@ package com.example.team5_project.controller;
 import java.sql.Timestamp;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
 
 import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
 import com.example.team5_project.service.CommentService;
 import com.example.team5_project.service.PostService;
-
+import com.example.team5_project.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,6 +33,7 @@ public class CommentController {
     private final PostService postService;
     private final HttpSession session;
 
+    @Autowired
     public CommentController(CommentService commentService, PostService postService, HttpSession session) {
         this.commentService = commentService;
         this.postService = postService;
@@ -43,33 +47,26 @@ public class CommentController {
                               @RequestParam("boardId") Long boardId,
                               RedirectAttributes redirectAttributes) {
         
-        // 세션에서 로그인된 사용자 정보 가져오기
         User sessionUser = (User) session.getAttribute("user");
         
-        // 로그인 여부 체크
         if (sessionUser == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 댓글을 작성할 수 있습니다.");
             return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
         }
 
-        // Post 객체 조회
         Post post = postService.findPost(postId);
-        
-        // Comment 객체 생성 및 설정
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setUser(sessionUser);  // 세션에서 가져온 사용자 설정
-        comment.setContent(content);
-        comment.setCommentTime(new Timestamp(System.currentTimeMillis()));
 
-        // 댓글 저장
+        // 생성자를 통해 Comment 객체 생성
+        Comment comment = new Comment(post, sessionUser, content, new Timestamp(System.currentTimeMillis()));
+
         commentService.saveComment(comment, sessionUser.getUserId(), postId);
 
         redirectAttributes.addFlashAttribute("message", "댓글이 작성되었습니다.");
         return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
     }
+
     
- // 댓글 삭제
+    // 댓글 삭제
     @PostMapping("/{postId}/comments/{commentId}/delete")
     public String deleteComment(@PathVariable("postId") Long postId, 
                                 @PathVariable("commentId") Long commentId, 

@@ -12,4 +12,6 @@ public interface PostRepository {
     /*public List<Post> findByBoardId(Long Id);*/
     public List<Post> findByUserId(Long Id);
     /*public List<Post> findByTitle(String Title,Long boardId);*/
+    public void increasePostViewCount(Long postId);
+    void updateCount(Post post, boolean liked);
 }

@@ -1,5 +1,6 @@
 package com.example.team5_project.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

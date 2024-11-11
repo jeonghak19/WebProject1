@@ -77,7 +77,7 @@ public class JdbcTemplatePostRepository implements PostRepository {
                 post.setPostId(key.longValue());
             }
         }else{
-            String sql = "UPDATE post SET post_title = ?, description = ?, img_name= ?, img_path = ?, like_count = ? WHERE board_id = ? AND post_id = ?";
+            String sql = "UPDATE post SET post_title = ?, description = ?, img_name= ?, img_path = ?, like_count =? WHERE board_id = ? AND post_id = ?";
             jdbcTemplate.update(sql,
                     post.getPostTitle(),
                     post.getDescription(),
@@ -94,9 +94,11 @@ public class JdbcTemplatePostRepository implements PostRepository {
     @Override
     public void delete(Post post) {
         String commentSql = "DELETE FROM comment WHERE post_id = ?";
+        String likeSql = "DELETE FROM likes WHERE post_id = ?";
         String postSql = "DELETE FROM post WHERE post_id = ?";
         
         jdbcTemplate.update(commentSql, post.getPostId());
+        jdbcTemplate.update(likeSql, post.getPostId());
         jdbcTemplate.update(postSql, post.getPostId());
     }
 
@@ -126,5 +128,32 @@ public class JdbcTemplatePostRepository implements PostRepository {
 
         return posts;
     }*/
+    
+    @Override
+    public void increasePostViewCount(Long postId) {
+        String sql = "UPDATE post SET view_count = view_count + 1 WHERE post_id = ?";
+        jdbcTemplate.update(sql, postId);
+    }    
+    
+    
+    public void updateCount(Post post, boolean liked) {
+    	String sql = "UPDATE post SET like_count = like_count+1 WHERE post_id = ?";
+    	String sql1 = "UPDATE post SET like_count = like_count-1 WHERE post_id = ?";
+    	
+    	if(liked) {
+    		jdbcTemplate.update(sql, post.getPostId());
+    	} else {
+    		jdbcTemplate.update(sql1, post.getPostId());
+    	}
+//    		
+//    	Integer increaseLike = liked ? 1 : -1;
+//    	Integer likeCount = post.getLikeCount() + increaseLike;
+//    	
+//    	post.setLikeCount(post.getLikeCount() + increaseLike);
+    	
+//    	System.out.println("increaselike " + increaseLike);
+//    	System.out.println("like count " + post.getLikeCount());
+//    	jdbcTemplate.update(sql, likeCount, post.getPostId());
+    }
 }
 

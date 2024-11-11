@@ -47,8 +47,8 @@ public class Post extends BaseEntity {
     private String imgPath;
     
     private String createdAt;
-    private String updateAt; 
-     
+    private String updateAt;
+    
     public PostResponseDto toDto() {
     	return PostResponseDto.builder()
     			.postId(postId)
@@ -59,5 +59,14 @@ public class Post extends BaseEntity {
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();
+    }
+    
+    public void updateCount(boolean liked) {
+    	if(liked) {
+    		likeCount +=1;
+    		
+    	} else {
+    		likeCount -=1;
+    	}
     }
 }

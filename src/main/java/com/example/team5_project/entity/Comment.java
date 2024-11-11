@@ -32,5 +32,12 @@ public class Comment extends BaseEntity {
 
     private String content;
     private Timestamp commentTime;
+    
+    public Comment(Post post, User user, String content, Timestamp commentTime) {
+        this.post = post;
+        this.user = user;
+        this.content = content;
+        this.commentTime = commentTime;
+    }
 
 }
