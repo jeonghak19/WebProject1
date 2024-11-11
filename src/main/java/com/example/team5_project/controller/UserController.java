@@ -3,10 +3,8 @@ package com.example.team5_project.controller;
 import com.example.team5_project.entity.User;
 import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.mapper.UserMapper;
-import com.example.team5_project.service.CommentService;
-import com.example.team5_project.service.PostPageService;
-import com.example.team5_project.service.PostService;
-import com.example.team5_project.service.UserService;
+import com.example.team5_project.repository.CommentPageRepository;
+import com.example.team5_project.service.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +22,13 @@ public class UserController {
 
     private final UserService userService;
     private final PostService postService;
-    private final CommentService commentService;
+    private final CommentPageService commentPageService;
     private final PostPageService postPageService;
 
-    public UserController(UserService userService, PostService postService, CommentService commentService, PostPageService postPageService) {
+    public UserController(UserService userService, PostService postService, CommentPageService commentPageService, PostPageService postPageService) {
         this.userService = userService;
         this.postService = postService;
-        this.commentService = commentService;
+        this.commentPageService = commentPageService;
         this.postPageService = postPageService;
     }
     // 사용자 목록 가져오기
@@ -73,10 +71,16 @@ public class UserController {
 
     // 사용자 수정
     @PostMapping("/home/user-update/{id}/edit")
-    public String updateUser(@PathVariable("id") Long id, @ModelAttribute User user, Model model) {
+    public String updateUser(@PathVariable("id") Long id,
+                             @ModelAttribute User user, Model model,
+                             @RequestParam(defaultValue = "0") int page) {
+
+        int pageSize = 5; // 한 페이지에 보여줄 게시물 개수
+        Pageable pageable = PageRequest.of(page, pageSize);
+
         user.setUserId(id);
         userService.updateUser(user);
-        model.addAttribute("comments",commentService.findCommentsByUserId(id));
+        model.addAttribute("comments",commentPageService.getCommentsByUserId(id,pageable));
         model.addAttribute("posts",postService.findUserPosts(id));
         return "redirect:/home/user-details/"+id;
     }
@@ -88,42 +92,27 @@ public class UserController {
         return "/home/user-update";
     }
 
-    /*// 특정 사용자 상세 정보 가져오기
-    @GetMapping("/home/user-details/{id}")
-    public String getUser(@PathVariable Long id, Model model,HttpSession session) {
-        User loginUser = (User) session.getAttribute("user");
-
-        if(loginUser == null) {
-            model.addAttribute("error","로그인이 필요합니다.");
-            return "redirect:/login";
-        }
-        if(loginUser.getUserId().equals(id)) {
-            model.addAttribute("comments",commentService.findCommentsByUserId(id));
-            model.addAttribute("posts",postService.findUserPosts(id));
-            model.addAttribute("user", userService.findUserByUserId(id));
-            return "/home/user-details";
-        }else{
-            model.addAttribute("error","접근 제한됨");
-            return "redirect:/home/users";
-        }
-    }*/
-
     // 특정 사용자 상세 정보 가져오기
     @GetMapping("/home/user-details/{id}")
     public String getUser(@PathVariable Long id,
                           Model model,HttpSession session,
-                          @RequestParam(defaultValue = "0") int page) {
+                          @RequestParam(defaultValue = "0") int postPage,
+                          @RequestParam(defaultValue = "0") int commentPage) {
         User loginUser = (User) session.getAttribute("user");
 
-        int pageSize = 5; // 한 페이지에 보여줄 게시물 개수
-        Pageable pageable = PageRequest.of(page, pageSize);
+        int postPageSize = 5; // 한 페이지에 보여줄 게시물 개수
+        Pageable postPageable = PageRequest.of(postPage, postPageSize);
+
+        int commentPageSize = 5;
+        Pageable commentPageable = PageRequest.of(commentPage, commentPageSize);
+
         if(loginUser == null) {
             model.addAttribute("error","로그인이 필요합니다.");
             return "redirect:/login";
         }
         if(loginUser.getUserId().equals(id)) {
-            model.addAttribute("comments",commentService.findCommentsByUserId(id));
-            model.addAttribute("postsPage",postPageService.getPostPageByUser(id,pageable));
+            model.addAttribute("commentsPage",commentPageService.getCommentsByUserId(id,commentPageable));
+            model.addAttribute("postsPage",postPageService.getPostPageByUser(id,postPageable));
             model.addAttribute("user", userService.findUserByUserId(id));
             return "/home/user-details";
         }else{
@@ -146,6 +135,7 @@ public class UserController {
 
         // 사용자 존재 여부 및 비밀번호 확인
         if (user != null && password.equals(user.getPassword())) {
+            user.setAttendance(user.getAttendance()+1);
             session.setAttribute("user", user);
             return "redirect:/board/list?loginSuccess=true"; // 로그인 성공 시 mainpage
         } else {

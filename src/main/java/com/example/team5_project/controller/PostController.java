@@ -3,16 +3,18 @@ package com.example.team5_project.controller;
 import com.example.team5_project.dto.PostDto;
 import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.Post;
-import com.example.team5_project.service.BoardService;
-import com.example.team5_project.service.CommentPageService;
-import com.example.team5_project.service.CommentService;
-import com.example.team5_project.service.PostService;
-import com.example.team5_project.service.UserService;
+import com.example.team5_project.entity.User;
+import com.example.team5_project.service.*;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,28 +27,68 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/home/posts")
 @Controller
+@Slf4j
 public class PostController {
 
-    @Autowired private PostService postService;
-    @Autowired private UserService userService;
-    @Autowired private CommentService commentService;
-    @Autowired private LikesService likesService;
-  
+    private final Map<Long, Set<Long>> userViewRecords = new ConcurrentHashMap<>();
+
+    private final PostService postService;
+    private final UserService userService;
+    private final LikesService likesService;
+    private final CommentPageService commentPageService;
+
+    public PostController(PostService postService,
+                          UserService userService,
+                          LikesService likesService,
+                          CommentPageService commentPageService) {
+        this.postService = postService;
+        this.userService = userService;
+        this.likesService = likesService;
+        this.commentPageService = commentPageService;
+    }
   	// 게시글 상세 페이지
     @GetMapping("/{postId}")
     public String post(@PathVariable("postId") Long postId, 
     				   @RequestParam("boardId") Long boardId,
+                       @RequestParam(value = "page", defaultValue = "0") int page,
+                       @RequestParam(value = "size", defaultValue = "10") int size,
+                       @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder,
     				   Model model,  
     				   HttpSession session) {
+
+        User user = (User) session.getAttribute("user");
+
+        if (user != null) {
+            // 사용자 ID를 키로 하는 조회 기록을 가져옴 - 존재하지 않을 경우 추가
+            Set<Long> viewedPosts = userViewRecords.computeIfAbsent(user.getUserId(), k -> new HashSet<>());
+
+            // 사용자가 현재 게시물을 조회한 적이 없다면 조회수 증가
+            if (!viewedPosts.contains(postId)) {
+                postService.visitPost(postId);  // 조회수 증가 메소드 호출
+                viewedPosts.add(postId);  // 현재 게시물 ID를 사용자 조회 기록에 추가
+                log.info("최초 방문");
+            }
+        }
+
         Post post = postService.findPost(postId);
         postService.increaseViewCount(postId);
-    	
+        // 댓글 페이지네이션 처리
+        Page<Comment> commentsPage = commentPageService.getCommentsByPostId(postId, page, size, sortOrder);
+        model.addAttribute("comments", commentsPage.getContent());
+        model.addAttribute("totalPages", commentsPage.getTotalPages());
+        model.addAttribute("currentPage", page);
+
+        String imgName = null;
+        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
+            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
+            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
+            model.addAttribute("imgName", imgName);
+        }
         model.addAttribute("post", post);
         model.addAttribute("boardId", boardId);
-        model.addAttribute("comments", commentService.findCommentsByPostId(postId));
         model.addAttribute("imgName", postService.getOriginalFileName(postId));
         
-        User user = (User)session.getAttribute("user");
+
         boolean liked = false;
         
         if(user != null) {

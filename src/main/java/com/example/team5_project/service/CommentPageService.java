@@ -28,4 +28,8 @@ public class CommentPageService {
         Pageable pageable = PageRequest.of(page, size, sort);
         return commentPageRepository.findByPost_PostId(postId, pageable);
     }
+
+    public Page<Comment> getCommentsByUserId(Long userId, Pageable pageable) {
+        return commentPageRepository.findByUser_UserId(userId, pageable);
+    }
 }

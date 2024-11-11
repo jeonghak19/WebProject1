@@ -48,7 +48,14 @@
             <input type="hidden" name="imgName" th:value="${imgName}">
             <button type="submit" class="btn btn-warning">게시글 수정</button>
         </form>
-
+        <!-- 정렬 순서 선택 -->
+        <form th:action="@{/home/posts/{postId}(postId=${post.postId})}" method="get">
+            <input type="hidden" name="boardId" th:value="${boardId}">
+            <input type="hidden" name="page" th:value="${currentPage}">
+            <input type="hidden" name="size" th:value="${size}">
+            <button type="submit" name="sortOrder" value="desc" class="btn btn-info">최신순</button>
+            <button type="submit" name="sortOrder" value="asc" class="btn btn-info">과거순</button>
+        </form>
 <!-- 버튼 클릭 함수 호출 -->
 <script type="text/javascript">
 function toggleLike() {

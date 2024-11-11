@@ -120,5 +120,10 @@ public class PostService {
     public void deletePost(Long postId){
         Post post = findPost(postId);
         postRepository.delete(post);
-    }   
+    }
+
+    @Transactional
+    public void visitPost(Long postId){
+        postRepository.increasePostViewCount(postId);
+    }
 }

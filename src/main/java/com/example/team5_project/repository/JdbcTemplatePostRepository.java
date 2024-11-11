@@ -126,5 +126,11 @@ public class JdbcTemplatePostRepository implements PostRepository {
 
         return posts;
     }*/
+
+    @Override
+    public void increasePostViewCount(Long postId) {
+        String sql = "UPDATE post SET view_count = view_count + 1 WHERE post_id = ?";
+        jdbcTemplate.update(sql, postId);
+    }
 }
 

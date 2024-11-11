@@ -6,6 +6,7 @@ import com.example.team5_project.service.PostPageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,11 +31,25 @@ public class PostPageController {
     public String searchPosts(@RequestParam("boardId") Long boardId,
                               @RequestParam(defaultValue = "") String searchTitle,
                               @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "time") String sortBy,
                               Model model) {
 
         int pageSize = 10; // 한 페이지에 보여줄 게시물 개수
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable;
 
+        if(sortBy.equalsIgnoreCase("view")) {
+            Sort viewSort = Sort.by(Sort.Direction.DESC, "viewCount");
+            pageable = PageRequest.of(page, pageSize,viewSort);
+        }else if(sortBy.equalsIgnoreCase("time")){
+            Sort createSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            pageable = PageRequest.of(page, pageSize,createSort);
+        }else{
+            Sort likeSort = Sort.by(Sort.Direction.DESC, "likeCount");
+            pageable = PageRequest.of(page, pageSize,likeSort);
+        }
+
+
+        model.addAttribute("sortBy", sortBy);
         model.addAttribute("searchTitle", searchTitle);
         model.addAttribute("boardTitle", boardService.getBoardTitle(boardId));
         model.addAttribute("boardId", boardId);
