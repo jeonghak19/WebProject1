@@ -61,10 +61,10 @@ public class BoardJdbcTempleteRepository implements BoardRepository {
 	}
 	
 	public void delete(Board board) {
-		String childSq1 = "DELETE FROM post WHERE board_id =?";
-		String sql = "DELETE FROM board WHERE board_id =?";
+		String postSq1 = "DELETE FROM post WHERE board_id =?";
+		String boardSql = "DELETE FROM board WHERE board_id =?";
 		
-		jdbcTemplate.update(childSq1, board.getBoardId());
-		jdbcTemplate.update(sql, board.getBoardId());
+		jdbcTemplate.update(postSq1, board.getBoardId());
+		jdbcTemplate.update(boardSql, board.getBoardId());
 	}
 }

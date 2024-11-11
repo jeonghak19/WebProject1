@@ -34,8 +34,6 @@ public class JdbcTemplatePostRepository implements PostRepository {
         post.setPostId(rs.getLong("post_id"));
         post.setPostTitle(rs.getString("post_title"));
         post.setDescription(rs.getString("description"));
-//        post.setPostLike(rs.getInt("post_like"));
-//        post.setPostDislike(rs.getInt("post_dislike"));
         post.setImgName(rs.getString("img_name"));
         post.setImgPath(rs.getString("img_path"));
         post.setCreatedAt(rs.getString("created_at"));
@@ -59,8 +57,8 @@ public class JdbcTemplatePostRepository implements PostRepository {
     @Override
     public Post save(Post post, Long boardId) {
         if(post.getPostId()==null){
-            String sql = "INSERT INTO post (user_id, post_title, description, /*post_like, post_dislike, */img_name, img_path, board_id) "
-            		+ "VALUES (/* ?, ?,*/?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO post (user_id, post_title, description, img_name, img_path, board_id) "
+            		+ "VALUES (?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
@@ -68,8 +66,6 @@ public class JdbcTemplatePostRepository implements PostRepository {
                 ps.setLong(1, post.getUser().getUserId());
                 ps.setString(2, post.getPostTitle());
                 ps.setString(3, post.getDescription());
-//                ps.setInt(3, post.getPostLike());
-//                ps.setInt(4, post.getPostDislike());
                 ps.setString(4, post.getImgName());
                 ps.setString(5, post.getImgPath());
                 ps.setLong(6, boardId);
@@ -81,15 +77,13 @@ public class JdbcTemplatePostRepository implements PostRepository {
                 post.setPostId(key.longValue());
             }
         }else{
-            String sql = "UPDATE post SET post_title = ?, description =?, /*post_like = ?, post_dislike = ?,*/img_name=?, img_path = ? WHERE board_id = ?"
-            		+ " AND post_id = ?";
+            String sql = "UPDATE post SET post_title = ?, description = ?, img_name= ?, img_path = ?, like_count = ? WHERE board_id = ? AND post_id = ?";
             jdbcTemplate.update(sql,
                     post.getPostTitle(),
                     post.getDescription(),
-//                    post.getPostLike(),
-//                    post.getPostDislike(),
                     post.getImgName(),
                     post.getImgPath(),
+                    post.getLikeCount(),
                     boardId,
                     post.getPostId()
             );
@@ -99,30 +93,31 @@ public class JdbcTemplatePostRepository implements PostRepository {
 
     @Override
     public void delete(Post post) {
-        String childSql = "DELETE FROM comment WHERE post_id = ?";
-        String sql = "DELETE FROM post WHERE post_id = ?";
+        String commentSql = "DELETE FROM comment WHERE post_id = ?";
+        String postSql = "DELETE FROM post WHERE post_id = ?";
         
-        jdbcTemplate.update(childSql, post.getPostId());
-        jdbcTemplate.update(sql, post.getPostId());
+        jdbcTemplate.update(commentSql, post.getPostId());
+        jdbcTemplate.update(postSql, post.getPostId());
     }
 
-    @Override
+
+   /* @Override
     public List<Post> findByBoardId(Long boardId) {
         String sql = "SELECT * FROM post WHERE board_id = ?";
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{boardId}, postRowMapper);
 
         return posts;
-    }
+    }*/
 
     @Override
     public List<Post> findByUserId(Long userId) {
         String sql = "SELECT * FROM post WHERE user_id = ?";
-        List<Post> posts = jdbcTemplate.query(sql, new Object[]{userId}, postRowMapper);
+        List<Post> posts = jdbcTemplate.query(sql, postRowMapper, new Object[]{userId});
 
         return posts;
     }
 
-    @Override
+    /*@Override
     public List<Post> findByTitle(String title,Long boardId) {
         String sql = "SELECT * FROM post WHERE post_title LIKE ? and board_id = ?";
         String searchTitle = "%" + title + "%";
@@ -130,6 +125,6 @@ public class JdbcTemplatePostRepository implements PostRepository {
         List<Post> posts = jdbcTemplate.query(sql, new Object[]{searchTitle,boardId}, postRowMapper);
 
         return posts;
-    }
+    }*/
 }
 

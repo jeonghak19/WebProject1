@@ -56,8 +56,8 @@ public class BoardController {
 	public String updateBoard(Board board, RedirectAttributes redirect) {
 		boardService.updateBoard(board);		
 		redirect.addAttribute("boardId", board.getBoardId());
-		
-		return "redirect:/home/posts";
+
+		return "redirect:/home/posts/search";
 	}	
 	
 	// 게시판 삭제
@@ -69,6 +69,5 @@ public class BoardController {
 		return "redirect:/board/list";
 	}
 }
-
 
 

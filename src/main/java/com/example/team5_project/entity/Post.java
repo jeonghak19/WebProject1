@@ -33,17 +33,22 @@ public class Post extends BaseEntity {
     @JoinColumn(name="board_id", nullable=false)
     private Board board;
 
-
+    @Column(name="post_title")
     private String postTitle;
     private String description;
-//    private Integer postLike;
-//    private Integer postDislike;
+    
+    @ColumnDefault("0")
+    private Integer viewCount =0;
+    
+    @ColumnDefault("0")
+    private Integer likeCount =0;
+    
     private String imgName;
     private String imgPath;
     
     private String createdAt;
-    private String updateAt;
-    
+    private String updateAt; 
+     
     public PostResponseDto toDto() {
     	return PostResponseDto.builder()
     			.postId(postId)
@@ -51,11 +56,8 @@ public class Post extends BaseEntity {
     			.board(board)
     			.postTitle(postTitle)
     			.description(description)
-//    			.postLike(postLike)
-//    			.postDislike(postDislike)
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();
-    }    
-    
+    }
 }

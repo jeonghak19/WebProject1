@@ -3,25 +3,22 @@ package com.example.team5_project.controller;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.ui.Model;
 
 import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
 import com.example.team5_project.service.CommentService;
 import com.example.team5_project.service.PostService;
-import com.example.team5_project.service.UserService;
+
 
 import jakarta.servlet.http.HttpSession;
 
@@ -31,14 +28,11 @@ public class CommentController {
     
     private final CommentService commentService;
     private final PostService postService;
-    private final UserService userService;
     private final HttpSession session;
 
-    @Autowired
-    public CommentController(CommentService commentService, PostService postService, UserService userService, HttpSession session) {
+    public CommentController(CommentService commentService, PostService postService, HttpSession session) {
         this.commentService = commentService;
         this.postService = postService;
-        this.userService = userService;
         this.session = session;
     }
 

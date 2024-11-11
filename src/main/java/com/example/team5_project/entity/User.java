@@ -1,6 +1,5 @@
 package com.example.team5_project.entity;
 
-import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;

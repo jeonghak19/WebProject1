@@ -1,5 +1,6 @@
 package com.example.team5_project.dto;
 
+
 import com.example.team5_project.entity.Board;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
@@ -22,8 +23,7 @@ public class PostDto {
 
     private String postTitle;
     private String description;
-//    private Integer postLike;
-//    private Integer postDislike;
+    
     private String imgName;
     private String imgPath;
     
@@ -34,8 +34,6 @@ public class PostDto {
     			.board(board)
     			.postTitle(postTitle)
     			.description(description)
-//    			.postLike(postLike)
-//    			.postDislike(postDislike)
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();

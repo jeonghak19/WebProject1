@@ -4,12 +4,13 @@ import com.example.team5_project.entity.User;
 import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.mapper.UserMapper;
 import com.example.team5_project.service.CommentService;
+import com.example.team5_project.service.PostPageService;
 import com.example.team5_project.service.PostService;
 import com.example.team5_project.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,17 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PostService postService;
-    @Autowired
-    private CommentService commentService;
+    private final UserService userService;
+    private final PostService postService;
+    private final CommentService commentService;
+    private final PostPageService postPageService;
 
+    public UserController(UserService userService, PostService postService, CommentService commentService, PostPageService postPageService) {
+        this.userService = userService;
+        this.postService = postService;
+        this.commentService = commentService;
+        this.postPageService = postPageService;
+    }
     // 사용자 목록 가져오기
     @GetMapping("/home/users")
     public String getUsers(Model model) {
@@ -81,7 +86,7 @@ public class UserController {
         return "/home/user-update";
     }
 
-    // 특정 사용자 상세 정보 가져오기
+    /*// 특정 사용자 상세 정보 가져오기
     @GetMapping("/home/user-details/{id}")
     public String getUser(@PathVariable Long id, Model model,HttpSession session) {
         User loginUser = (User) session.getAttribute("user");
@@ -98,6 +103,30 @@ public class UserController {
         }else{
             model.addAttribute("error","접근 제한됨");
             return "redirect:/home/users";
+        }
+    }*/
+
+    // 특정 사용자 상세 정보 가져오기
+    @GetMapping("/home/user-details/{id}")
+    public String getUser(@PathVariable Long id,
+                          Model model,HttpSession session,
+                          @RequestParam(defaultValue = "0") int page) {
+        User loginUser = (User) session.getAttribute("user");
+
+        int pageSize = 5; // 한 페이지에 보여줄 게시물 개수
+        Pageable pageable = PageRequest.of(page, pageSize);
+        if(loginUser == null) {
+            model.addAttribute("error","로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+        if(loginUser.getUserId().equals(id)) {
+            model.addAttribute("comments",commentService.findCommentsByUserId(id));
+            model.addAttribute("postsPage",postPageService.getPostPageByUser(id,pageable));
+            model.addAttribute("user", userService.findUserByUserId(id));
+            return "/home/user-details";
+        }else{
+            model.addAttribute("error","접근 제한됨");
+            return "redirect:/board/list";
         }
     }
 

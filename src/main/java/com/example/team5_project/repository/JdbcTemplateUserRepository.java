@@ -30,7 +30,7 @@ public class JdbcTemplateUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(Long userId) {
         String sql = "select * from user where user_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{userId},userRowMapper).stream().findFirst();
+        return jdbcTemplate.query(sql, userRowMapper, new Object[]{userId}).stream().findFirst();
     }
 
     @Override
@@ -79,18 +79,18 @@ public class JdbcTemplateUserRepository implements UserRepository {
     @Override
     public Optional<User> findbyCommentId(Long commentId) {
         String sql = "SELECT * FROM user JOIN comment ON user.user_id = comment.user_id WHERE comment.comment_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{commentId},userRowMapper).stream().findFirst();
+        return jdbcTemplate.query(sql, userRowMapper, new Object[]{commentId}).stream().findFirst();
     }
 
     @Override
     public Optional<User> findbyPostId(Long postId) {
         String sql = "SELECT * FROM user JOIN post ON user.user_id = post.user_id WHERE post.post_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{postId},userRowMapper).stream().findFirst();
+        return jdbcTemplate.query(sql, userRowMapper, new Object[]{postId}).stream().findFirst();
     }
 
     @Override
     public Optional<User> findByName(String name) {
         String sql = "SELECT * FROM user WHERE name = ?";
-        return jdbcTemplate.query(sql, new Object[]{name},userRowMapper).stream().findFirst();
+        return jdbcTemplate.query(sql, userRowMapper, new Object[]{name}).stream().findFirst();
     }
 }

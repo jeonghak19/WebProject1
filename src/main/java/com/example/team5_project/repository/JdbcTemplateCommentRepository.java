@@ -1,6 +1,6 @@
 package com.example.team5_project.repository;
 
-import com.example.team5_project.entity.Board;
+
 import com.example.team5_project.entity.Post;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,9 +12,6 @@ import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.User;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,12 +85,12 @@ public class JdbcTemplateCommentRepository implements CommentRepository {
     @Override
     public List<Comment> findByPostId(Long Id) {
         String sql = "select * from comment where post_id = ?";
-        return jdbcTemplate.query(sql,new Object[]{Id},commentRowMapper);
+        return jdbcTemplate.query(sql,commentRowMapper, new Object[]{Id});
     }
 
     @Override
     public List<Comment> findByUserId(Long Id) {
         String sql = "select * from comment where user_id = ?";
-        return jdbcTemplate.query(sql,new Object[]{Id},commentRowMapper);
+        return jdbcTemplate.query(sql, commentRowMapper, new Object[]{Id});
     }
 }
