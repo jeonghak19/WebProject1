@@ -30,7 +30,8 @@
             <th>Description</th>
             <!--             <th>Likes</th>
                         <th>Dislikes</th> -->
-            <th>User Name</th>
+            <th>User</th>
+            <th>View Count</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -39,9 +40,8 @@
             <td th:text="${post.postId}"></td>
             <td th:text="${post.postTitle}"></td>
             <td th:text="${post.description}"></td>
-            <!--             <td th:text="${post.postLike}"></td>
-                        <td th:text="${post.postDislike}"></td> -->
             <td th:text="${post.user.name}"></td>
+            <td th:text="${post.viewCount}"></td>
             <td>
                 <a th:href="@{/home/posts/{postId}(postId=${post.postId}, boardId=${boardId})}" class="btn btn-info">View</a>
 

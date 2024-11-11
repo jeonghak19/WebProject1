@@ -28,36 +28,33 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostController {
 
     @Autowired private PostService postService;
-    @Autowired private BoardService boardService;
     @Autowired private UserService userService;
     @Autowired private CommentService commentService;
-    @Autowired private CommentPageService commentPageService;
-
+    @Autowired private LikesService likesService;
   
+  	// 게시글 상세 페이지
     @GetMapping("/{postId}")
-    public String post(@PathVariable("postId") Long postId,
-                       @RequestParam("boardId") Long boardId,
-                       @RequestParam(value = "page", defaultValue = "0") int page,
-                       @RequestParam(value = "size", defaultValue = "10") int size,
-                       @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder,
-                       Model model) {
-
-        model.addAttribute("post", postService.findPost(postId));
+    public String post(@PathVariable("postId") Long postId, 
+    				   @RequestParam("boardId") Long boardId,
+    				   Model model,  
+    				   HttpSession session) {
+        Post post = postService.findPost(postId);
+        postService.increaseViewCount(postId);
+    	
+        model.addAttribute("post", post);
         model.addAttribute("boardId", boardId);
-
-        // 댓글 페이지네이션 처리
-        Page<Comment> commentsPage = commentPageService.getCommentsByPostId(postId, page, size, sortOrder);
-        model.addAttribute("comments", commentsPage.getContent());
-        model.addAttribute("totalPages", commentsPage.getTotalPages());
-        model.addAttribute("currentPage", page);
-
-        String imgName = null;
-        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
-            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
-            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
-            model.addAttribute("imgName", imgName);
+        model.addAttribute("comments", commentService.findCommentsByPostId(postId));
+        model.addAttribute("imgName", postService.getOriginalFileName(postId));
+        
+        User user = (User)session.getAttribute("user");
+        boolean liked = false;
+        
+        if(user != null) {
+        	liked = likesService.getLike(postId, user.getUserId());
         }
-
+        model.addAttribute("liked", liked);
+        model.addAttribute("likeCount", post.getLikeCount());
+        
         return "home/post-details";
     }
     
@@ -71,8 +68,9 @@ public class PostController {
         
         return "home/posts-create";
     }
-    
+
     // 게시글 생성
+    // 파일 첨부 여부에 따라 로직이 다름.
     @PostMapping("/create")
     public String createPost(PostDto postDto, 
     						 Long boardId, 
@@ -80,30 +78,22 @@ public class PostController {
     						 @RequestParam("userId") Long userId,
     						 Model model, 
     						 RedirectAttributes redirect) throws IOException {
+    	System.out.println(file.getOriginalFilename());
+		if(postDto == null) {
+			return "redirect:/home/posts/create";
+		}
     	
     	Post post = postDto.toPost();    	
     	post.setUser(userService.findUserByUserId(userId));
-    	
-    	if(file == null) {
-    		Post newPost = postService.createPost(post, boardId);
-    		
-        	if(newPost == null) {
-        		return "redirect:/home/posts/create";
-        	}   
-    	} else {
-    		Post newPost = postService.createPostWithFile(post, boardId,file);
-    		
-        	if(newPost == null) {
-        		return "redirect:/home/posts/create";
-        	}     
-    	}
+    	    	
+    	if(file != null && !file.isEmpty()) {
+    		postService.uploadFile(post, file);
+		} 
+    	postService.createPost(post, boardId);
     	
     	redirect.addAttribute("boardId", boardId);
-  
         return "redirect:/home/posts/search";
     }
-
-    
     
     // 게시글 수정 페이지
     @GetMapping("/update")
@@ -111,39 +101,34 @@ public class PostController {
 
     	model.addAttribute("post", postService.findPost(postId));
     	model.addAttribute("boardId", boardId);
-    	
-        String imgName = null;
-        if (postService.findPost(postId).getImgName() != null && !postService.findPost(postId).getImgName().isEmpty()) {
-  
-            String[] imgNameParts = postService.findPost(postId).getImgName().split("_");
-            imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
-            model.addAttribute("imgName", imgName);
-        }
-    	
+        model.addAttribute("originalFileName", postService.getOriginalFileName(postId));
 
     	return "home/posts-update";
     }   
     
-    
     // 게시글 수정
     @PostMapping("/update")
     public String updatePost(Long postId, Long boardId, 
-    						 Post post, 
+    						 Post post,
+    						 String imgPath,
+    						 String imgName,
     						 RedirectAttributes redirect, 
     						 MultipartFile file) throws IOException { 	
 
-    	if(file == null) {
+    	if(file == null || file.isEmpty()) {
+    		if(imgPath != null || imgName != null) {
+    			post.setImgPath(imgPath);
+    			post.setImgName(imgName);
+    		}
     		postService.updatePost(post, boardId);
-        	redirect.addAttribute("boardId", boardId);
     	} else {
-    		postService.uploadFile(post, file);
-    		
+    		postService.uploadFile(post, file);    		
     		postService.updatePost(post, boardId);
-        	redirect.addAttribute("boardId", boardId);
     	}
-    	
-       
-        return "redirect:/home/posts/search";
+    	redirect.addAttribute("boardId", boardId);
+    	redirect.addAttribute("postId", postId);
+
+		return "redirect:/home/posts/{postId}";
     }
     
     // 게시글 삭제
@@ -155,5 +140,4 @@ public class PostController {
 
         return "redirect:/home/posts/search";
     }
-
 }

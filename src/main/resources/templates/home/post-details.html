@@ -5,21 +5,40 @@
 <body>
 <div th:replace="~{navbar :: div}"></div>
 
+
 <div class="container">
     <h1>Post Details</h1>
     <div>
-        <h2 th:text="${post.postTitle}"></h2>
-        <p th:text="'Description: ' + ${post.description}"></p>
         <p th:text="'User Name: ' + ${post.user.name}"></p>
         <p th:if="${post.createdAt} != null" th:text="'작성일: ' + ${post.createdAt}"></p>
         <p th:if="${post.createdAt} != ${post.updatedAt}" th:text="'수정일: ' + ${post.updatedAt}"></p>
-<!--         <p th:text="'Likes: ' + ${post.postLike}"></p>
-        <p th:text="'Dislikes: ' + ${post.postDislike}"></p> -->
-
+        <p th:text="'조회수: ' + ${post.viewCount}"></p>
+		
+		<!-- 좋아요 부분 -->
+		<div>
+    		<p id="likeCount" th:text="'좋아요: ' + ${likeCount}"></p>
+    		<div th:if="${session.user != null}">
+        		<form id="likeForm" th:action="@{/home/posts/like}" method="post">
+            		<input type="hidden" name="postId" th:value="${post.postId}">
+            		<input type="hidden" name="userId" th:value="${session.user.userId}">
+					<button type="button" id="likeButton" onclick="toggleLike()" style="background: none; border: none;">
+    					<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="${liked ? 'red' : 'currentColor'}"
+         			  	  		class="bi bi-heart${liked ? '-fill' : ''}" viewBox="0 0 16 16">
+       					 	<path fill-rule="evenodd" 
+              						d="${liked ? 'M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314' 
+                         				: 'm8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15'}">
+        				 	</path>
+    				 	</svg>
+					</button>
+        		</form>
+    		</div>
+		 </div>	
+		
+        <h2 th:text="'제목: ' + ${post.postTitle}"></h2>
+        <p th:text="'Description: ' + ${post.description}"></p>
         <div th:if="${post.imgName} !=null">
-            <a th:href="@{${post.imgPath}}" class="img-fluid" th:text="${imgName}"></a>
+            <img th:src="@{${post.imgPath}}" class="img-fluid" th:alt="${imgName}">
         </div>
-
 
         <a th:href="@{/home/posts/search(boardId = ${boardId})}" class="btn btn-secondary">Back to Posts</a>
 
@@ -29,17 +48,36 @@
             <input type="hidden" name="imgName" th:value="${imgName}">
             <button type="submit" class="btn btn-warning">게시글 수정</button>
         </form>
+
+<!-- 버튼 클릭 함수 호출 -->
+<script type="text/javascript">
+function toggleLike() {
+    const form = document.getElementById('likeForm');
+    const postId = form.querySelector('input[name="postId"]').value;
+    const userId = form.querySelector('input[name="userId"]').value;
+
+    fetch(`/home/posts/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: postId, userId: userId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likeButton = document.getElementById('likeButton');
+        const likeCountText = document.getElementById('likeCount');
         
-        <!-- 정렬 순서 선택 -->
-        <form th:action="@{/home/posts/{postId}(postId=${post.postId})}" method="get">
-            <input type="hidden" name="boardId" th:value="${boardId}">
-            <input type="hidden" name="page" th:value="${currentPage}">
-            <input type="hidden" name="size" th:value="${size}">
-            <button type="submit" name="sortOrder" value="desc" class="btn btn-info">최신순</button>
-            <button type="submit" name="sortOrder" value="asc" class="btn btn-info">과거순</button>
-        </form>
-
-
+        if (data.liked) {
+            likeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/></svg>`;
+        } else {
+            likeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16"><path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/></svg>`;
+        }
+        
+        likeCount.textContent = `좋아요: ${data.likeCount}`;
+    })
+}
+</script>
 
         <!-- 댓글 리스트 -->
         <form th:action="@{/home/posts/{postId}/comments(postId=${post.postId})}" method="post">

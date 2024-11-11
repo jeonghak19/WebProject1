@@ -88,12 +88,12 @@ public class JdbcTemplateCommentRepository implements CommentRepository {
     @Override
     public List<Comment> findByPostId(Long Id) {
         String sql = "select * from comment where post_id = ?";
-        return jdbcTemplate.query(sql,new Object[]{Id},commentRowMapper);
+        return jdbcTemplate.query(sql,commentRowMapper, new Object[]{Id});
     }
 
     @Override
     public List<Comment> findByUserId(Long Id) {
         String sql = "select * from comment where user_id = ?";
-        return jdbcTemplate.query(sql,new Object[]{Id},commentRowMapper);
+        return jdbcTemplate.query(sql, commentRowMapper, new Object[]{Id});
     }
 }

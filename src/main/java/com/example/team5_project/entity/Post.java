@@ -36,8 +36,13 @@ public class Post extends BaseEntity {
     @Column(name="post_title")
     private String postTitle;
     private String description;
-//    private Integer postLike;
-//    private Integer postDislike;
+    
+    @ColumnDefault("0")
+    private Integer viewCount =0;
+    
+    @ColumnDefault("0")
+    private Integer likeCount =0;
+    
     private String imgName;
     private String imgPath;
     
@@ -51,11 +56,8 @@ public class Post extends BaseEntity {
     			.board(board)
     			.postTitle(postTitle)
     			.description(description)
-//    			.postLike(postLike)
-//    			.postDislike(postDislike)
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();
-    }    
-    
+    }
 }

@@ -22,8 +22,7 @@ public class PostDto {
 
     private String postTitle;
     private String description;
-//    private Integer postLike;
-//    private Integer postDislike;
+    
     private String imgName;
     private String imgPath;
     
@@ -34,8 +33,6 @@ public class PostDto {
     			.board(board)
     			.postTitle(postTitle)
     			.description(description)
-//    			.postLike(postLike)
-//    			.postDislike(postDislike)
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();
