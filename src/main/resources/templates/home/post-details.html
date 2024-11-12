@@ -139,7 +139,7 @@ function toggleLike() {
                 </div>
             </div>
             
-            <div class="pagination">
+			<div class="pagination">
                 <ul class="pagination">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                         <a class="page-link" th:href="@{/home/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage - 1})}">Previous</a>

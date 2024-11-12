@@ -35,6 +35,8 @@ public class Post extends BaseEntity {
 
     @Column(name="post_title")
     private String postTitle;
+    
+    @Column(columnDefinition = "TEXT")
     private String description;
     
     @ColumnDefault("0")
