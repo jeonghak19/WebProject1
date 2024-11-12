@@ -1,0 +1,15 @@
+<div class="navbar navbar-light bg-light">
+    <div class="container d-flex justify-content-end align-items-center">
+        <span th:if="${!session.isEmpty()}" class="navbar-text mr-3">
+            <strong>Welcome, </strong><span th:text="${session.user.name}"></span>
+        </span>
+
+        <button th:if="${!session.isEmpty()}"
+                th:onclick="'window.location.href=\'/user/user-details/' + ${session.user.userId} + '\';'"
+                class="btn btn-info mr-2">My Page</button>
+
+        <button th:if="${session.isEmpty()}" onclick="window.location.href='/user/login'" class="btn btn-primary mr-2">로그인</button>
+
+        <button th:if="${!session.isEmpty()}" onclick="window.location.href='/user/logout'" class="btn btn-secondary">로그아웃</button>
+    </div>
+</div>
