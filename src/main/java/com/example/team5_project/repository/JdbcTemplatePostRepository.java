@@ -38,6 +38,7 @@ public class JdbcTemplatePostRepository implements PostRepository {
         post.setImgPath(rs.getString("img_path"));
         post.setCreatedAt(rs.getString("created_at"));
         post.setUpdatedAt(rs.getString("updated_at"));
+        post.setLikeCount(rs.getInt("like_count"));
 
         Optional<User> user = userRepository.findById(rs.getLong("user_id"));
         post.setUser(user.isPresent() ? user.get() : null);
@@ -94,11 +95,9 @@ public class JdbcTemplatePostRepository implements PostRepository {
     @Override
     public void delete(Post post) {
         String commentSql = "DELETE FROM comment WHERE post_id = ?";
-        String likeSql = "DELETE FROM likes WHERE post_id = ?";
         String postSql = "DELETE FROM post WHERE post_id = ?";
         
         jdbcTemplate.update(commentSql, post.getPostId());
-        jdbcTemplate.update(likeSql, post.getPostId());
         jdbcTemplate.update(postSql, post.getPostId());
     }
 
@@ -137,23 +136,14 @@ public class JdbcTemplatePostRepository implements PostRepository {
     
     
     public void updateCount(Post post, boolean liked) {
-    	String sql = "UPDATE post SET like_count = like_count+1 WHERE post_id = ?";
-    	String sql1 = "UPDATE post SET like_count = like_count-1 WHERE post_id = ?";
+    	String plusSql = "UPDATE post SET like_count = like_count+1 WHERE post_id = ?";
+    	String minusSql = "UPDATE post SET like_count = like_count-1 WHERE post_id = ?";
     	
     	if(liked) {
-    		jdbcTemplate.update(sql, post.getPostId());
+    		jdbcTemplate.update(plusSql, post.getPostId());
     	} else {
-    		jdbcTemplate.update(sql1, post.getPostId());
+    		jdbcTemplate.update(minusSql, post.getPostId());
     	}
-//    		
-//    	Integer increaseLike = liked ? 1 : -1;
-//    	Integer likeCount = post.getLikeCount() + increaseLike;
-//    	
-//    	post.setLikeCount(post.getLikeCount() + increaseLike);
-    	
-//    	System.out.println("increaselike " + increaseLike);
-//    	System.out.println("like count " + post.getLikeCount());
-//    	jdbcTemplate.update(sql, likeCount, post.getPostId());
     }
 }
 

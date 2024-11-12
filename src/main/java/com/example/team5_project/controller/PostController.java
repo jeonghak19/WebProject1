@@ -5,8 +5,6 @@ import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
 import com.example.team5_project.service.CommentPageService;
-import com.example.team5_project.service.CommentService;
-import com.example.team5_project.service.LikesService;
 import com.example.team5_project.service.PostService;
 import com.example.team5_project.service.UserService;
 
@@ -14,10 +12,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,12 +34,10 @@ public class PostController {
 
     @Autowired private PostService postService;
     @Autowired private UserService userService;
-    @Autowired private LikesService likesService;
     @Autowired private CommentPageService commentPageService;
     
     private final Map<Long, Set<Long>> likeMap = new HashMap<>();
     private final Map<Long, Set<Long>> userViewRecords = new ConcurrentHashMap<>();
-    private final Map<Long, Long> likeCountMap = new HashMap<>();
     
   	// 게시글 상세 페이지
     @GetMapping("/{postId}")
@@ -62,7 +56,6 @@ public class PostController {
         boolean liked = false;
         
         if(user != null) {
-        //	liked = likesService.getLike(postId, user.getUserId());
    		
             // 사용자 ID를 키로 하는 조회 기록을 가져옴 - 존재하지 않을 경우 추가
             Set<Long> viewedPosts = userViewRecords.computeIfAbsent(user.getUserId(), k -> new HashSet<>());        	
@@ -98,18 +91,12 @@ public class PostController {
             imgName = imgNameParts.length > 1 ? imgNameParts[1] : null;
             model.addAttribute("imgName", imgName);
         }
+        
         model.addAttribute("post", post);
         model.addAttribute("boardId", boardId);
         model.addAttribute("imgName", postService.getOriginalFileName(postId));     
         model.addAttribute("liked", liked);
-        
-        
-        Post newPost = postService.findPost(postId);
-      //  model.addAttribute("likeCount", post.getLikeCount());
-        System.out.println("게시글 상세 페이지 이동 전 현재 liked상태: " + liked);
-        System.out.println("게시글 상세 페이지 이동 전 현재 likeCount: " + newPost.getLikeCount());
-        System.out.println("게시글 상세 페이지 이동 전 현재 postId: " +postId);
-        System.out.println("게시글 상세 페이지 이동 전 현재 userId: " +post.getUser().getUserId());       
+        model.addAttribute("likeCount", post.getLikeCount());
            
         return "home/post-details";
     }
@@ -211,25 +198,6 @@ public class PostController {
         Post post = postService.findPost(postId);
 	    User user = userService.findUserByUserId(userId);
 
-//	    if (likesService.getLike(postId, userId)) {
-//	        likesService.deleteLike(postId, userId);
-//	        System.out.println("like 컨트롤러 삭제쪽 현재 likeCount: " +post.getLikeCount());
-//
-//	        liked = false;
-//	       // postService.updateCount(post, liked);
-//	        postService.updatePost(post, userId);
-//	        System.out.println("좋아요 취소 후 likeCount: " + post.getLikeCount());
-//	        
-//	    } else {
-//	        likesService.addLike(post, user);
-//	        System.out.println("like 컨트롤러 추가 쪽 현재 likeCount: " +post.getLikeCount());
-//
-//	        liked = true;
-//	        //postService.updateCount(post, liked);
-//	        postService.updatePost(post, userId);
-//	        System.out.println("좋아요 누른 후 likeCount: " + post.getLikeCount());
-//	    }
-
 	    	if(likeMap.get(userId).contains(postId)) {
 	    		likeMap.get(userId).remove(postId);
 	    		liked = false;
@@ -244,8 +212,8 @@ public class PostController {
 	    }
 	    
 		response.put("liked", liked);
-		//response.put("likeCount", post.getLikeCount());
-		response.put("post", post);
+		response.put("likeCount", post.getLikeCount());
+
 		return response;
 	}
     

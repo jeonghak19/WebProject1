@@ -69,4 +69,5 @@ public class Post extends BaseEntity {
     		likeCount -=1;
     	}
     }
+
 }
