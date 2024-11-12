@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@RequestMapping("/home/posts")
+@RequestMapping("/post/posts")
 @Controller
 public class PostPageController {
 
@@ -58,6 +58,6 @@ public class PostPageController {
         }else{
             model.addAttribute("postsPage", postPageService.getPostPageByTitle(searchTitle,boardId,pageable));
         }
-        return "home/posts"; // 기존 페이지와 동일하게 렌더링
+        return "post/posts"; // 기존 페이지와 동일하게 렌더링
     }
 }

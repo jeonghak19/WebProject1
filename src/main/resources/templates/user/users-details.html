@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/header :: head}"></head>
+<body>
+<div th:replace="~{fragment/navbar :: div}"></div>
+<div class="container">
+    <h1 th:text="${user.Name} + ' 페이지'"></h1>
+    <div>
+        <h2 th:text="${user.Name}"></h2>
+        <p th:text="'비밀번호: ' + ${user.password}"></p>
+        <p th:text="'이메일: ' + ${user.email}"></p>
+        <p th:text="'출석: ' + ${user.attendance}"></p>
+        <a href="/board/list" class="btn btn-secondary">Back to Boards</a>
+        <a th:href="@{/user/user-update/{id}(id=${user.userId})}" class="btn btn-secondary">유저 정보 수정</a>
+
+    </div>
+    <hr>
+    <form th:action="@{/user/user-details/{id}/delete(id=${user.userId})}" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-danger">회원탈퇴</button>
+    </form>
+
+    <h2>작성한 게시물</h2>
+    <table th:if="${posts!=null}" class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>게시판 이름</th>
+            <th>작성일</th>
+            <th>보기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="post : ${posts}">
+            <td th:text="${post.postId}"></td>
+            <td th:text="${post.postTitle}"></td>
+            <td th:text="${post.createdAt}"></td>
+            <td><a th:href="@{/post/posts/{postId}(postId=${post.postId},boardId=${post.board.boardId})}" class="btn btn-info">게시물 보러 가기</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>작성한 댓글</h2>
+    <table th:if="${comments!=null}" class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>내용</th>
+            <th>작성일</th>
+            <th>보기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="comment : ${comments}">
+            <td th:text="${comment.commentId}"></td>
+            <td th:text="${comment.content}"></td>
+            <td th:text="${comment.commentTime}"></td>
+            <td><a th:href="@{/post/posts/{postId}(postId=${comment.post.postId},boardId=${comment.post.board.boardId})}" class="btn btn-info">댓글 보러 가기</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<div th:replace="~{fragment/footer :: footer}"></div>
+</body>
+
+</html>
+

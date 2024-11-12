@@ -26,7 +26,7 @@ import com.example.team5_project.service.UserService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/home/posts")
+@RequestMapping("/post/posts")
 public class CommentController {
     
     private final CommentService commentService;
@@ -51,7 +51,7 @@ public class CommentController {
         
         if (sessionUser == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 댓글을 작성할 수 있습니다.");
-            return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+            return "redirect:/post/posts/" + postId + "?boardId=" + boardId;
         }
 
         Post post = postService.findPost(postId);
@@ -62,7 +62,7 @@ public class CommentController {
         commentService.saveComment(comment, sessionUser.getUserId(), postId);
 
         redirectAttributes.addFlashAttribute("message", "댓글이 작성되었습니다.");
-        return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+        return "redirect:/post/posts/" + postId + "?boardId=" + boardId;
     }
 
     
@@ -79,7 +79,7 @@ public class CommentController {
     	// 로그인 여부 체크
     	if (sessionUser == null) {
     	    redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 댓글을 작성할 수 있습니다.");
-    	    return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+    	    return "redirect:/post/posts/" + postId + "?boardId=" + boardId;
     	}
 
 
@@ -93,7 +93,7 @@ public class CommentController {
             redirectAttributes.addFlashAttribute("errorMessage", "삭제 권한이 없습니다.");
         }
 
-        return "redirect:/home/posts/" + postId + "?boardId=" + boardId;
+        return "redirect:/post/posts/" + postId + "?boardId=" + boardId;
     }
 
     // 댓글 수정

@@ -23,8 +23,6 @@ public class PostResponseDto {
 
     private String postTitle;
     private String description;
-//    private Integer postLike;
-//    private Integer postDislike;
     private String imgName;
     private String imgPath;
     

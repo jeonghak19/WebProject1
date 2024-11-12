@@ -27,7 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 
-@RequestMapping("/home/posts")
+@RequestMapping("/post/posts")
 @Controller
 @Slf4j
 public class PostController {
@@ -98,7 +98,7 @@ public class PostController {
         model.addAttribute("liked", liked);
         model.addAttribute("likeCount", post.getLikeCount());
            
-        return "home/post-details";
+        return "post/post-details";
     }
     
     // 게시글 생성 페이지
@@ -109,7 +109,7 @@ public class PostController {
         
         post.setUser(userService.findUserByUserId(userId));
         
-        return "home/posts-create";
+        return "post/posts-create";
     }
 
     // 게시글 생성
@@ -123,7 +123,7 @@ public class PostController {
     						 RedirectAttributes redirect) throws IOException {
     	System.out.println(file.getOriginalFilename());
 		if(postDto == null) {
-			return "redirect:/home/posts/create";
+			return "redirect:/post/posts/create";
 		}
     	
     	Post post = postDto.toPost();    	
@@ -135,7 +135,7 @@ public class PostController {
     	postService.createPost(post, boardId);
     	
     	redirect.addAttribute("boardId", boardId);
-        return "redirect:/home/posts/search";
+        return "redirect:/post/posts/search";
     }
     
     // 게시글 수정 페이지
@@ -146,7 +146,7 @@ public class PostController {
     	model.addAttribute("boardId", boardId);
         model.addAttribute("originalFileName", postService.getOriginalFileName(postId));
 
-    	return "home/posts-update";
+    	return "post/posts-update";
     }   
     
     // 게시글 수정
@@ -171,7 +171,7 @@ public class PostController {
     	redirect.addAttribute("boardId", boardId);
     	redirect.addAttribute("postId", postId);
 
-		return "redirect:/home/posts/{postId}";
+		return "redirect:/post/posts/{postId}";
     }
     
     // 게시글 삭제
@@ -181,7 +181,7 @@ public class PostController {
     	postService.deletePost(postId);
         redirect.addAttribute("boardId", boardId);
 
-        return "redirect:/home/posts/search";
+        return "redirect:/post/posts/search";
     }
     
     // 좋아요 버튼 눌렀을 때
@@ -190,7 +190,7 @@ public class PostController {
     public Map<String, Object> clickLike(@RequestBody Map<String, Long> requestData) {
     	Long postId = requestData.get("postId");
 	    Long userId = requestData.get("userId");
-	    
+
     	Map<String, Object> response = new HashMap<>();
 
 	    boolean liked = false;        
@@ -198,21 +198,20 @@ public class PostController {
         Post post = postService.findPost(postId);
 	    User user = userService.findUserByUserId(userId);
 
-	    	if(likeMap.get(userId).contains(postId)) {
-	    		likeMap.get(userId).remove(postId);
-	    		liked = false;
+	    if(likeMap.get(userId).contains(postId)) {
+	    	likeMap.get(userId).remove(postId);
+	    	liked = false;
 	    		
-	    		postService.updateCount(post, liked);
-	    		
-	    	} else {
-	    		likeMap.get(userId).add(postId);
-	    		liked = true;
-	    		
-	    		postService.updateCount(post, liked);
+	    } else {
+	    	likeMap.get(userId).add(postId);
+	    	liked = true;
 	    }
+	    	
+    	postService.updateCount(post, liked);
+		Post newPost = postService.findPost(postId);
 	    
 		response.put("liked", liked);
-		response.put("likeCount", post.getLikeCount());
+		response.put("likeCount", newPost.getLikeCount());
 
 		return response;
 	}

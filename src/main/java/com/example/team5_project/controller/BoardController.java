@@ -57,7 +57,7 @@ public class BoardController {
 		boardService.updateBoard(board);		
 		redirect.addAttribute("boardId", board.getBoardId());
 		
-		return "redirect:/home/posts/search";
+		return "redirect:/post/posts/search";
 	}	
 	
 	// 게시판 삭제

@@ -71,7 +71,7 @@ public class PostService {
     // 파일 업로드 관련
     public void uploadFile(Post post, MultipartFile file) throws IOException {
     	// 파일 경로 설정
-    	String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
+    	String projectPath = "C:/Prj1/Files/";
     	
     	// 서버 저장용 파일 이름 설정
     	UUID uuid = UUID.randomUUID();

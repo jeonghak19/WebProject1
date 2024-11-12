@@ -34,6 +34,8 @@ public class JdbcTemplatePostRepository implements PostRepository {
         post.setPostId(rs.getLong("post_id"));
         post.setPostTitle(rs.getString("post_title"));
         post.setDescription(rs.getString("description"));
+        post.setLikeCount(rs.getInt("like_count"));
+        post.setViewCount(rs.getInt("view_count"));
         post.setImgName(rs.getString("img_name"));
         post.setImgPath(rs.getString("img_path"));
         post.setCreatedAt(rs.getString("created_at"));

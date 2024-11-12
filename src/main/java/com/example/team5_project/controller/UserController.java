@@ -3,17 +3,19 @@ package com.example.team5_project.controller;
 import com.example.team5_project.entity.User;
 import com.example.team5_project.dto.UserPostDto;
 import com.example.team5_project.mapper.UserMapper;
-import com.example.team5_project.repository.CommentPageRepository;
 import com.example.team5_project.service.*;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 
@@ -32,45 +34,61 @@ public class UserController {
         this.postPageService = postPageService;
     }
     // 사용자 목록 가져오기
-    @GetMapping("/home/users")
+    @GetMapping("/user/users")
     public String getUsers(Model model) {
 
         model.addAttribute("users", userService.findUsers());
-        return "/home/users";
+        return "/user/users";
     }
 
+    // 이름 중복 체크
+    @GetMapping("/user/check-name")
+    @ResponseBody
+    public Map<String, Object> checkName(@RequestParam String name) {
+        Map<String, Object> response = new HashMap<>();
+        User existingUser = userService.findUserByName(name);
+        response.put("isAvailable", existingUser == null); // 중복되지 않으면 true, 중복되면 false
+        return response;
+    }
+
+
     // 사용자 등록
-    @PostMapping("/register")
-    public String registerUser(@ModelAttribute UserPostDto userPostDto,Model model) {
-        User user = userService.findUserByName(userPostDto.getName());
+    @PostMapping("/user/register")
+    public String registerUser(@Valid @ModelAttribute User user,
+                               BindingResult bindingResult,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            return "user/register"; // 오류가 있으면 register.html로 다시 돌아감
+        }
+        User newUser = userService.findUserByName(user.getName());
 
         // 사용자 존재 여부 및 비밀번호 확인
-        if (user == null) {
-            User newUser = UserMapper.toEntity(userPostDto);
-            userService.createUser(newUser);
-            return "redirect:/board/list";
+        if (newUser == null) {
+            userService.createUser(user);
+            return "user/login";
         } else {
-            model.addAttribute("error", "이미 존재하는 이름입니다.");
-            return "register";  // 실패 시 다시 회원가입 페이지로 이동
+            bindingResult.rejectValue("name", "error.user", "이미 존재하는 이름입니다.");
+            return "user/register";  // 실패 시 다시 회원가입 페이지로 이동
         }
     }
 
     // 등록화면 이동
-    @GetMapping("/register")
-    public String MoveRegister() {
-        return "register";
+    @GetMapping("/user/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new User()); // 빈 User 객체를 폼에 전달
+        return "user/register"; // 회원가입 폼을 반환 (register.html)
     }
 
     // 사용자 삭제
-    @PostMapping("/home/user-details/{id}/delete")
+    @PostMapping("/user/user-details/{id}/delete")
     public String deleteUser(@PathVariable("id") Long id,HttpSession session) {
         userService.deleteUser(id);
         session.invalidate();
-        return "redirect:/board/list";
+        return "redirect:/user/login";
     }
 
     // 사용자 수정
-    @PostMapping("/home/user-update/{id}/edit")
+    @PostMapping("/user/user-update/{id}/edit")
     public String updateUser(@PathVariable("id") Long id,
                              @ModelAttribute User user, Model model,
                              @RequestParam(defaultValue = "0") int page) {
@@ -82,18 +100,18 @@ public class UserController {
         userService.updateUser(user);
         model.addAttribute("comments",commentPageService.getCommentsByUserId(id,pageable));
         model.addAttribute("posts",postService.findUserPosts(id));
-        return "redirect:/home/user-details/"+id;
+        return "redirect:/user/user-details/"+id;
     }
 
     // 사용자 수정 화면
-    @GetMapping("/home/user-update/{id}")
+    @GetMapping("/user/user-update/{id}")
     public String moveupdateUser(@PathVariable("id") Long id,Model model) {
         model.addAttribute("user",userService.findUserByUserId(id));
-        return "/home/user-update";
+        return "/user/user-update";
     }
 
     // 특정 사용자 상세 정보 가져오기
-    @GetMapping("/home/user-details/{id}")
+    @GetMapping("/user/user-details/{id}")
     public String getUser(@PathVariable Long id,
                           Model model,HttpSession session,
                           @RequestParam(defaultValue = "0") int postPage,
@@ -108,13 +126,13 @@ public class UserController {
 
         if(loginUser == null) {
             model.addAttribute("error","로그인이 필요합니다.");
-            return "redirect:/login";
+            return "redirect:/user/login";
         }
         if(loginUser.getUserId().equals(id)) {
             model.addAttribute("commentsPage",commentPageService.getCommentsByUserId(id,commentPageable));
             model.addAttribute("postsPage",postPageService.getPostPageByUser(id,postPageable));
             model.addAttribute("user", userService.findUserByUserId(id));
-            return "/home/user-details";
+            return "/user/user-details";
         }else{
             model.addAttribute("error","접근 제한됨");
             return "redirect:/board/list";
@@ -122,13 +140,13 @@ public class UserController {
     }
 
     // 로그인 페이지 이동
-    @GetMapping("/login")
+    @GetMapping("/user/login")
     public String showLoginPage() {
-        return "login";
+        return "user/login";
     }
 
     // 로그인 처리
-    @PostMapping("/login")
+    @PostMapping("/user/login")
     public String login(@RequestParam String name, @RequestParam String password, HttpSession session, Model model) {
 
         User user = userService.findUserByName(name);
@@ -140,15 +158,15 @@ public class UserController {
             return "redirect:/board/list?loginSuccess=true"; // 로그인 성공 시 mainpage
         } else {
             model.addAttribute("error", "잘못된 이름 또는 비밀번호입니다.");
-            return "login";  // 실패 시 다시 로그인 페이지로 이동
+            return "user/login";  // 실패 시 다시 로그인 페이지로 이동
         }
     }
 
-    @GetMapping("/logout")
+    @GetMapping("/user/logout")
     public String logout(HttpSession session,Model model) {
         session.invalidate();  // 세션 무효화하여 로그아웃 처리
         model.addAttribute("check", "로그아웃 되었습니다.");
-        return "redirect:/login";  // 로그인 페이지로 리디렉션
+        return "redirect:/user/login";  // 로그인 페이지로 리디렉션
     }
 }
 

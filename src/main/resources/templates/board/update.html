@@ -1,14 +1,25 @@
 <!DOCTYPE html>
- <html  lang ="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <head th:replace="~{fragment/header :: head}"></head>
 	<meta charset="UTF-8">
 	<title>Update Board</title>
 </head>
-<body>
-	<form th:action="@{/board/update(boardId= ${board.boardId})}"  method="post">
-		<textarea th:text="${board.boardTitle}" name="boardTitle" ></textarea>
-		<button type="submit">수정 완료</button>
-	</form>
 
+<body>
+
+<div th:replace="~{fragment/navbar :: div}"></div>
+
+<br><h1 id="h1-center">게시판 수정</h1>
+<form th:action="@{/board/update(boardId= ${board.boardId})}"  method="post">
+	<div class="form-group">
+		<label for="title">게시판 이름</label>
+		<input type="text" class="form-control" name="boardTitle" th:value="${board.boardTitle}"><br><br>
+            <div class="align-center">
+       			<button type="submit" class="btn btn-outline-primary">등록</button>
+        	</div>
+    </div>
+</form>
+	
 </body>
 </html>
