@@ -1,8 +1,11 @@
 package com.example.team5_project.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.team5_project.entity.Board;
 import com.example.team5_project.entity.Post;
 import com.example.team5_project.entity.User;
+import com.example.team5_project.validator.ValidFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +26,10 @@ public class PostDto {
     private String postTitle;
     private String description;
     
+
+    @ValidFile(message = "파일은 5MB이하, 파일 형식은 jpg, png만 가능합니다.")
+    private MultipartFile file;
+    
     private String imgName;
     private String imgPath;
     
@@ -32,7 +39,7 @@ public class PostDto {
     			.user(user)
     			.board(board)
     			.postTitle(postTitle)
-    			.description(description.replace("\n", "<br>"))  // 개행 처리를 추가
+    			.description(description.replace("\r\n", "<br>"))  // 개행 처리를 추가
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();
