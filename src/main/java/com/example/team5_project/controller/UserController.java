@@ -60,16 +60,9 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "user/register"; // 오류가 있으면 register.html로 다시 돌아감
         }
-        User newUser = userService.findUserByName(user.getName());
 
-        // 사용자 존재 여부 및 비밀번호 확인
-        if (newUser == null) {
-            userService.createUser(user);
-            return "user/login";
-        } else {
-            bindingResult.rejectValue("name", "error.user", "이미 존재하는 이름입니다.");
-            return "user/register";  // 실패 시 다시 회원가입 페이지로 이동
-        }
+        userService.createUser(user);
+        return "user/login";
     }
 
     // 등록화면 이동

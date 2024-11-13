@@ -1,5 +1,11 @@
 <div class="navbar navbar-light bg-light">
-    <div class="container d-flex justify-content-end align-items-center">
+    <div class="container d-flex justify-content-start align-items-center">
+
+        <!-- 좌측에 로고 이미지 추가 -->
+        <a href="/board/list" class="navbar-brand mr-auto">
+            <img src="/images/Health_Mate.jpg" alt="Logo" style="max-height: 25px;">
+        </a>
+        <!-- 사용자 인사말 및 버튼 오른쪽에 배치 -->
         <span th:if="${!session.isEmpty()}" class="navbar-text mr-3">
             <strong>Welcome, </strong><span th:text="${session.user.name}"></span>
         </span>

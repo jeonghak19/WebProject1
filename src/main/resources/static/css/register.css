@@ -1,0 +1,27 @@
+
+
+body.bg-light {
+    background-color: #f8f9fa;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.text-center img {
+    max-width: 300px;
+    margin-bottom: 1rem;
+}
+
+.card {
+    width: 100%;
+    max-width: 400px;
+}
+
+.btn.w-100 {
+    width: 100%;
+}
