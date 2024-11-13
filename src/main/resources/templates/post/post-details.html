@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <head th:replace="~{fragment/header :: head}"></head>
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/postDetails.css">
 </head>
+
 
 <body>
 <div th:replace="~{fragment/navbar :: div}"></div>
@@ -60,140 +62,99 @@
         <a th:href="@{/post/posts/search(boardId = ${boardId})}" class="btn btn-secondary float-right">목록</a><br><br>
         
         
-        <!-- 정렬 순서 선택 -->
-        <form th:action="@{/post/posts/{postId}(postId=${post.postId})}" method="get">
-            <input type="hidden" name="boardId" th:value="${boardId}">
-            <input type="hidden" name="page" th:value="${currentPage}">
-            <input type="hidden" name="size" th:value="${size}">
-            <button type="submit" name="sortOrder" value="desc" class="btn btn-info">최신순</button>
-            <button type="submit" name="sortOrder" value="asc" class="btn btn-info">과거순</button>
-        </form>
+        <form th:action="@{/post/posts/{postId}/comments(postId=${post.postId})}" method="post">
+		    <div class="mb-3">
+		        <textarea name="content" class="form-control" placeholder="댓글을 입력하세요" rows="4" required></textarea>
+		    </div>
+		    <input type="hidden" name="boardId" th:value="${boardId}">
+		    <button type="submit" class="btn btn-primary">댓글 작성</button>
+		</form>
 
+		<form th:action="@{/post/posts/{postId}(postId=${post.postId})}" method="get">
+		    <input type="hidden" name="boardId" th:value="${boardId}">
+		    <input type="hidden" name="page" th:value="${currentPage}">
+		    <input type="hidden" name="size" th:value="${size}">
+		    <div class="d-flex justify-content-end">
+		        <button type="submit" name="sortOrder" value="desc" class="btn btn-info mr-2">최신순</button>
+		        <button type="submit" name="sortOrder" value="asc" class="btn btn-info">과거순</button>
+		    </div>
+		</form>
 
-        <!-- 댓글 리스트 -->
-        <div class="card p-3">
-            <h3>댓글</h3>
-            <form th:action="@{/post/posts/{postId}/comments(postId=${post.postId})}" method="post">
-                <div class="mb-3">
-                    <textarea name="content" class="form-control" placeholder="댓글을 입력하세요" required></textarea>
-                </div>
-                <input type="hidden" name="boardId" th:value="${boardId}">
-                <button type="submit" class="btn btn-primary">댓글 작성</button>
-            </form>
+		<div class="comment-list mt-3">
+		    <div th:each="comment : ${comments}" class="mb-3 border-bottom pb-2" style="position: relative;">
+		        <div>
+		            <p class="mb-0"><strong th:text="${comment.user != null ? comment.user.name : 'Anonymous'}">User Name</strong>
+		                <span class="text-muted" th:text="${comment.commentTime}">Time</span>
+		            </p>
+		            <p class="mb-1" th:text="${comment.content}">Content</p>
+		        </div>
+		
+		        <div th:if="${comment.user != null and session.user != null and comment.user.userId == session.user.userId}"
+		             style="position: absolute; right: 0; bottom: 0;">
+		            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCommentModal"
+		                th:data-comment-id="${comment.commentId}" th:data-comment-content="${comment.content}" th:data-post-id="${post.postId}">수정</button>
+		            
+		            <!-- 삭제 폼 -->
+		            <form th:action="@{/post/posts/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" 
+		                  method="post" class="d-inline">
+		                <input type="hidden" name="boardId" th:value="${boardId}">
+		                <button type="submit" class="btn btn-sm btn-danger" onclick="confirmDelete()">삭제</button>
+		            </form>
+		        </div>
+		    </div>
+		
+		    <!-- 페이지네이션 -->
+			<div class="pagination mt-3 d-flex justify-content-center" th:if="${totalPages > 1}">
+			    <ul class="pagination">
+			        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+			            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage - 1})}">Previous</a>
+			        </li>
+			        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+			            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${i})}" th:text="${i + 1}"></a>
+			        </li>
+			        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+			            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage + 1})}">Next</a>
+			        </li>
+			    </ul>
+			</div>
+		
+		</div>
+		
+		<!-- 댓글 수정 모달 -->
+		<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="editCommentModalLabel">댓글 수정</h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <div class="modal-body">
+		                <form id="editCommentForm">
+		                    <div class="mb-3">
+		                        <textarea class="form-control" id="editCommentContent" rows="3" required></textarea>
+		                    </div>
+		                    <input type="hidden" id="commentId">
+		                    <input type="hidden" id="postId"> <!-- 추가: postId를 hidden으로 저장 -->
+		                    <button type="submit" class="btn btn-primary">수정하기</button>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
-            <div class="comment-list mt-3">
-                <div th:each="comment : ${comments}" class="mb-3 border-bottom pb-2">
-                    <div class="d-flex justify-content-between">
-                        <p class="mb-0"><strong th:text="${comment.user != null ? comment.user.name : 'Anonymous'}">User Name</strong> 
-                            <span class="text-muted" th:text="${comment.commentTime}">Time</span>
-                        </p>
-                        <div th:if="${comment.user != null and session.user != null and comment.user.userId == session.user.userId}">
-                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCommentModal" 
-                                    th:data-comment-id="${comment.commentId}" th:data-comment-content="${comment.content}" th:data-post-id="${post.postId}">수정</button>
-                            <form th:action="@{/post/posts/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" method="post" class="d-inline">
-                                <input type="hidden" name="boardId" th:value="${boardId}">
-                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-                            </form>
-                        </div>
-                    </div>
-                    <p class="mb-1" th:text="${comment.content}">Content</p>
-                </div>
-                
-                <!-- 페이지네이션: 댓글이 있을 때만 표시 -->
-                <div class="pagination mt-3" th:if="${#lists.size(comments) > 0}">
-                    <ul class="pagination">
-                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage - 1})}">Previous</a>
-                        </li>
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${i})}" th:text="${i + 1}"></a>
-                        </li>
-                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage + 1})}">Next</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-
-<!-- 댓글 수정 모달 -->
-<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editCommentModalLabel">댓글 수정</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editCommentForm">
-                    <div class="mb-3">
-                        <textarea class="form-control" id="editCommentContent" rows="3" required></textarea>
-                    </div>
-                    <input type="hidden" id="commentId">
-                    <input type="hidden" id="postId"> <!-- 추가: postId를 hidden으로 저장 -->
-                    <button type="submit" class="btn btn-primary">수정하기</button>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 
-<!-- Bootstrap JS (필요한 경우) -->
+
+</div>
+
+
+<script src="/js/postDetails.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // 수정 버튼 클릭 시 모달에 댓글 정보 채우기
-    const editButtons = document.querySelectorAll('.btn-warning');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.getAttribute('data-comment-id');
-            const commentContent = this.getAttribute('data-comment-content');
-            const postId = this.getAttribute('data-post-id'); // postId를 가져옴
-            
-            // 모달에 댓글 정보 채우기
-            document.getElementById('commentId').value = commentId;
-            document.getElementById('editCommentContent').value = commentContent;
-            document.getElementById('postId').value = postId; // postId도 채우기
-        });
-    });
-
-    // 수정 폼 제출
-    const form = document.getElementById('editCommentForm');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const commentId = document.getElementById('commentId').value;
-        const postId = document.getElementById('postId').value;
-        const newContent = document.getElementById('editCommentContent').value;
-
-        // 서버로 수정된 댓글 내용 전송 (AJAX 사용)
-        fetch(`/home/posts/${postId}/comments/${commentId}/edit`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ content: newContent })  // JSON 형식으로 데이터 전송
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('댓글이 수정되었습니다.');
-                location.reload();  // 새로고침으로 댓글 내용 반영
-            } else {
-                alert('수정에 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-});
-</script>
-</div>
+</body>
+<footer>
 
 <div th:replace="~{fragment/footer :: footer}"></div>
-</body>
+</footer>
 </html>

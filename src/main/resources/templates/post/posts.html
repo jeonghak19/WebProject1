@@ -3,7 +3,7 @@
 <head>
     <head th:replace="~{fragment/header :: head}"></head>
 </head>
-
+<link rel="stylesheet" href="/css/post.css">
 <body>
 <div th:replace="~{fragment/navbar :: div}"></div>
 
@@ -81,11 +81,13 @@
             <td th:text="${post.createdAt}"></td>
             <td>
                 <!-- 삭제 버튼은 작성자만 보임 -->
-                <form id="post-del" th:if="${session.user != null and session.user.userId == post.user.userId}" action="/post/posts/delete" method="POST">
-                    <input type="hidden" name="postId" th:value="${post.postId}">
-                    <input type="hidden" name="boardId" th:value="${boardId}">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+				<form id="post-del" th:if="${session.user != null and session.user.userId == post.user.userId}" 
+				      action="/post/posts/delete" method="POST" 
+				      onsubmit="return confirmDelete()">
+				    <input type="hidden" name="postId" th:value="${post.postId}">
+				    <input type="hidden" name="boardId" th:value="${boardId}">
+				    <button type="submit" class="btn btn-danger">Delete</button>
+				</form>
             </td>
         </tr>
         </tbody>
@@ -120,6 +122,11 @@
 
 </div>
 
+<script>
+    function confirmDelete() {
+        return confirm("정말로 삭제하겠습니까?");
+    }
+</script>
  
 <div th:replace="~{fragment/footer :: footer}"></div>
 </body>

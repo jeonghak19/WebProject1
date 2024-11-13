@@ -1,12 +1,12 @@
 <!DOCTYPE html>
  <html  lang ="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragment/header :: head}"></head>
-
+<link rel="stylesheet" href="/css/boardList.css">
 <body>
 <div th:replace="~{fragment/navbar :: div}"></div>
 
 <div class="container top-item">
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
+
 	
 <div class="grid text-center card-grid">
 	<div class="card" th:each="board : ${boards}">

@@ -16,4 +16,20 @@
 	float: right; 
 	margin-left: 8px;
 }
-	
+.card-grid {
+	display: flex;
+	justify-content: space-evenly;
+	flex-wrap: wrap;
+	margin:5px;
+}
+
+.card {
+	width: 20rem;
+	height: 12rem;
+	margin: 10px;
+}
+
+.create-btn {
+	float: right;
+	margin:4px;
+}
