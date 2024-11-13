@@ -32,7 +32,7 @@ public class PostDto {
     			.user(user)
     			.board(board)
     			.postTitle(postTitle)
-    			.description(description)
+    			.description(description.replace("\n", "<br>"))  // 개행 처리를 추가
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();

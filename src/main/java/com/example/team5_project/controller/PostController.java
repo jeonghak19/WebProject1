@@ -198,21 +198,20 @@ public class PostController {
         Post post = postService.findPost(postId);
 	    User user = userService.findUserByUserId(userId);
 
-	    	if(likeMap.get(userId).contains(postId)) {
-	    		likeMap.get(userId).remove(postId);
-	    		liked = false;
+	    if(likeMap.get(userId).contains(postId)) {
+	    	likeMap.get(userId).remove(postId);
+	    	liked = false;
 	    		
-	    		postService.updateCount(post, liked);
-	    		
-	    	} else {
-	    		likeMap.get(userId).add(postId);
-	    		liked = true;
-	    		
-	    		postService.updateCount(post, liked);
+	    } else {
+	    	likeMap.get(userId).add(postId);
+	    	liked = true;
 	    }
+	    	
+    	postService.updateCount(post, liked);
+		Post newPost = postService.findPost(postId);
 	    
 		response.put("liked", liked);
-		response.put("likeCount", post.getLikeCount());
+		response.put("likeCount", newPost.getLikeCount());
 
 		return response;
 	}

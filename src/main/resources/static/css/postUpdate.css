@@ -1,0 +1,29 @@
+
+.form-group {
+	max-width: 800px; margin: 0 auto;
+}
+
+#description {
+	width:100%; 
+	overflow: hidden; 
+	resize: none; 
+	height: 100px;	  
+}
+
+.align-center {
+	display: flex; 
+	justify-content: center;
+}
+
+#file {
+	display: none;
+}
+
+#info-text {
+	font-size: 13px;
+}
+
+#h1-center {
+	text-align: center;
+}
+
