@@ -1,0 +1,81 @@
+
+.top-item {
+	margin-top:25px;
+}
+
+#post-user {
+	margin-top: 15px;
+}
+
+#user-icon {
+	width: 50px; 
+	height: 50px; 
+	float: left;
+}
+
+#like-icon {
+	width: 23px;
+	height: 23px;
+	float: right; 
+	margin-left:15px;
+}
+
+.count {
+	 float: right; 
+	 margin-left:5px;
+} 
+
+#post-username {
+	float: left; 
+	margin-left:11px;
+}
+
+.float-right {
+	float: right;
+}
+
+#view-icon {
+	width:30px;
+	height: 30px;
+	float: right;
+}
+
+.post-body {
+	margin-left:60px; 
+	margin-right:60px;
+}
+
+.post-div {
+	 display: flex; 
+	 justify-content: center;
+}
+
+
+.post-image {
+	 max-width: 720px; 
+	 max-height:540px;
+}
+
+.post-desc {
+	font-size:20px;
+	word-spacing:5px; 
+	line-height:35px;
+}
+
+#likeButton {
+	 background: none; 
+	 border: none;
+	 filter: invert(21%) sepia(91%) saturate(4925%) hue-rotate(354deg) brightness(91%) contrast(122%);
+     width: 50px;
+	 height: 50px;
+} 
+
+#like-btn-div {
+	 display: flex; 
+	 justify-content: center;
+}
+
+#like-btn {
+	width: 50px;
+	height: 50px;
+}

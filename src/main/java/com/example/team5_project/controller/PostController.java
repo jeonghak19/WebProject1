@@ -121,7 +121,6 @@ public class PostController {
     						 @RequestParam("userId") Long userId,
     						 Model model, 
     						 RedirectAttributes redirect) throws IOException {
-    	System.out.println(file.getOriginalFilename());
 		if(postDto == null) {
 			return "redirect:/post/posts/create";
 		}

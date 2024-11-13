@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+  <h1>Users</h1>
+
+  <div th:if="${#lists.isEmpty(users)}" class="alert alert-warning">
+    <strong>No users found.</strong> There are currently no users to display.
+  </div>
+
+  <table class="table" th:if="${!#lists.isEmpty(users)}">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Attendance</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+      <td th:text="${user.userId}"></td>
+      <td th:text="${user.name}"></td>
+      <td th:text="${user.email}"></td>
+      <td th:text="${user.attendance}"></td>
+      <td th:if="${!session.isEmpty() and session.user.userId == user.userId}">
+        <!-- View user button -->
+        <form th:action="@{/user/user-details/{id}(id=${user.userId})}" method="get" style="display:inline;">
+          <button type="submit" class="btn btn-danger">유저 수정하기</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<div class="navbar fixed-top navbar-light bg-light">
+  <div class="container">
+    <div class="navbar-nav ml-auto">
+      <!-- 로그인한 사용자 이름 표시 -->
+      <span th:if="${!session.isEmpty()}" class="navbar-text">
+        <strong>Welcome, </strong><span th:text="${session.user.name}"></span>
+      </span>
+
+      <!-- 로그인 버튼이 없는 경우에만 표시 -->
+      <button th:if="${session.isEmpty()}" onclick="window.location.href='/user/login'" class="btn btn-primary">로그인</button>
+      <button th:if="${!session.isEmpty()}" onclick="window.location.href='/user/logout'" class="btn btn-secondary">로그아웃</button>
+    </div>
+  </div>
+</div>
+<script>
+  // URL 파라미터로 로그인 성공 여부를 확인하여 알림 표시
+  const urlParams = new URLSearchParams(window.location.search);
+  const loginSuccess = urlParams.get('loginSuccess');
+
+  if (loginSuccess === 'true') {
+    alert("로그인 성공!");
+
+    // 알림 후 URL에서 파라미터 제거
+    urlParams.delete('loginSuccess');
+    const newUrl = window.location.pathname + '?' + urlParams.toString();
+    window.history.replaceState({}, document.title, newUrl);
+  }
+
+</script>
+</body>
+</html>
