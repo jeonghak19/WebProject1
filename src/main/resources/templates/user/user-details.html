@@ -20,7 +20,7 @@
         </div>
 
         <form th:action="@{/user/user-details/{id}/delete(id=${user.userId})}" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-danger mt-3">회원탈퇴</button>
+            <button type="submit" class="btn btn-danger mt-3" onclick="confirmDelete()">회원탈퇴</button>
         </form>
     </div>
 
@@ -111,8 +111,6 @@
 </div>
 <div th:replace="~{fragment/footer :: footer}"></div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/js/postDetails.js"></script>
 </body>
 </html>

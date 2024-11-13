@@ -8,51 +8,46 @@
 <div th:replace="~{fragment/navbar :: div}"></div>
 
 <div class="container">
-    <h1 class= "top-item" th:text="${boardTitle}"></h1>
-    
-   <form action="/post/posts/create" th:object="${post}">
-        <input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
-        <input type="hidden" name="boardId" th:value="${boardId}">
-        <button th:if="${session.user != null}" type="submit" class="btn btn-outline-primary post-btn">게시글 작성</button>
-    </form>
-   	<form action="/board/list" method="get">
-    	<button type="submit" class="btn btn-outline-primary post-btn">HOME</button>
-	</form>
-    
-    <!-- 검색창 추가 -->
-    <form action="/post/posts/search" method="get" class="form-inline mb-3">
-        <input type="hidden" name="boardId" th:value="${boardId}">
-        <input type="text" name="searchTitle" class="form-control mr-2" placeholder="Search posts by title" th:value="${searchTitle}" />
-        <button type="submit" class="btn btn-primary search-btn">검색</button>
-    </form>
+
+    <div class="bottom-item">
+        <div class="header-image">
+            <img th:src="@{/images/{boardTitle}.jpg(boardTitle=${boardTitle})}" alt="Background Image">
+            <h1 class="header-title top-item" th:text="${boardTitle}"></h1>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- 검색창 -->
+        <form action="/post/posts/search" method="get" class="form-inline">
+            <input type="hidden" name="boardId" th:value="${boardId}">
+            <input type="text" name="searchTitle" class="form-control mr-2" placeholder="Search posts by title" th:value="${searchTitle}" />
+            <button type="submit" class="btn btn-primary search-btn">검색</button>
+        </form>
+        <!-- 정렬 방법 선택 -->
+        <div class="d-flex align-items-center">
+            <div class="btn-group">
+                <a th:href="@{/post/posts/search(boardId=${boardId}, searchTitle=${searchTitle}, sortBy='popular')}"
+                   class="btn btn-outline-secondary"
+                   th:classappend="${sortBy == 'popular'} ? 'active' : ''">
+                    인기순
+                </a>
+                <a th:href="@{/post/posts/search(boardId=${boardId}, searchTitle=${searchTitle}, sortBy='view')}"
+                   class="btn btn-outline-secondary"
+                   th:classappend="${sortBy == 'view'} ? 'active' : ''">
+                    조회순
+                </a>
+                <a th:href="@{/post/posts/search(boardId=${boardId}, searchTitle=${searchTitle}, sortBy='time')}"
+                   class="btn btn-outline-secondary"
+                   th:classappend="${sortBy == 'time'} ? 'active' : ''">
+                    최신순
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- postsPage가 비어있는 경우 메시지 표시 -->
     <div th:if="${#lists.isEmpty(postsPage.content)}" class="alert alert-warning">
         <strong>No posts found.</strong> There are currently no posts to display.
-    </div>
-
-    <!-- 정렬 방법 선택 -->
-    <div class="mb-3 d-flex align-items-center">
-        <label class="mr-2">정렬 기준:</label>
-        <div class="btn-group">
-            <a th:href="@{/post/posts/search(boardId=${boardId}, searchTitle=${searchTitle}, sortBy='popular')}"
-               class="btn btn-outline-secondary"
-               th:classappend="${sortBy == 'popular'} ? 'active' : ''">
-                인기순
-            </a>
-
-            <a th:href="@{/post/posts/search(boardId=${boardId}, searchTitle=${searchTitle}, sortBy='view')}"
-               class="btn btn-outline-secondary"
-               th:classappend="${sortBy == 'view'} ? 'active' : ''">
-                조회순
-            </a>
-
-            <a th:href="@{/post/posts/search(boardId=${boardId}, searchTitle=${searchTitle}, sortBy='time')}"
-               class="btn btn-outline-secondary"
-               th:classappend="${sortBy == 'time'} ? 'active' : ''">
-                시간순
-            </a>
-        </div>
     </div>
     
     <!-- postsPage가 있는 경우 테이블 표시 -->
@@ -92,7 +87,16 @@
         </tr>
         </tbody>
     </table>
-    
+
+    <form action="/post/posts/create" th:object="${post}">
+        <input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
+        <input type="hidden" name="boardId" th:value="${boardId}">
+        <button th:if="${session.user != null}" type="submit" class="btn btn-outline-primary post-btn">게시글 작성</button>
+    </form>
+    <form action="/board/list" method="get">
+        <button type="submit" class="btn btn-outline-primary post-btn">HOME</button>
+    </form>
+
 	<form th:if="${session.user != null and session.user.name == '관리자'}" th:action="@{/board/delete(boardId = ${boardId})}" method="post">
     	<button type="submit" class="btn btn-outline-danger post-btn">게시판 삭제</button>
 	</form>
