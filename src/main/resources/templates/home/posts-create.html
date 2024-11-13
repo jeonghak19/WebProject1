@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+    <h2>Add New Post</h2>
+    <form action="/home/posts/create" th:object="${postDto}" method="post" enctype="multipart/form-data">
+    	<input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
+   	    <input type="hidden" name="boardId" th:value="${boardId}">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" name="postTitle" id="title" required>
+        </div>
+ 	    <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" class="form-control" name="description" id="description">
+        </div>
+        <div class="form-group">
+            <label for="file" >Upload File</label>
+            <input type="file" class="form-control" name ="file" id="file" accept="image/png, image/jpeg"><br>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Post</button>
+    </form>
+
+</body>
+</html>
