@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/postDetails.css">
+</head>
+
+
+<body>
+<div th:replace="~{fragment/navbar :: div}"></div>
+
+<div class= "post-detail-form">
+<div class="container">
+   
+    <h1 class ="top-item" th:text="${post.postTitle}"></h1>
+    <div>
+        <div id="post-user">
+        	<img id="user-icon" src="/icons/user_icon.png" alt="user_icon">
+        	<p id ="post-username" th:text="${post.user.name}"></p>
+       		<div th:if="${post.createdAt} != null">
+       			<p class ="float-right" th:text="${post.createdAt} != ${post.updatedAt} ? ${post.updatedAt} : ${post.createdAt}"></p><br><br>
+       		</div>
+		</div>
+		
+		
+    	<p id="likeCount" class="count" th:text="'좋아요 ' + ${likeCount}"></p>
+    	<img id="like-icon" src="/icons/like.png" alt="like_icon">
+		
+        <p class="count" th:text="'조회 ' + ${post.viewCount}"></p>
+        <img id = "view-icon" src="/icons/view_icon.png" alt="view_icon">
+		
+
+        <br><hr class="border border-2 opacity-50">
+        <div class="post-body">
+        	<br><div class="post-image-div" th:if="${post.imgName} !=null">
+            	<img class="post-image" th:src="@{${post.imgPath}}" th:alt="${imgName}">
+        	</div><br>        
+        	<p class="post-desc" th:utext="${post.description}"></p><br>
+        </div>
+        
+			<!-- 좋아요 버튼 -->
+    		<br><br><div id="like-btn-div" th:if="${session.user != null}">
+        		<form id="likeForm" th:action="@{/post/posts/like}" method="post">
+            		<input type="hidden" name="postId" th:value="${post.postId}">
+            		<input type="hidden" name="userId" th:value="${session.user.userId}">
+					<span id="likeCount">좋아요</span>
+					<button th:if="${liked}" type="button" id="likeButton" onclick="toggleLike()"> 
+						<img class="like-btn" src="/icons/heart-fill.png">
+					</button>
+					<button th:if="${!liked}" type="button" id="likeButton" onclick="toggleLike()">
+						<img class="like-btn" src="/icons/heart.png">
+					</button>
+        		</form>
+    		</div>    		
+		
+		<hr class="border border-2 opacity-50">
+        <form th:if="${session.user != null and session.user.userId == post.user.userId}" action="/post/posts/update">
+            <input type="hidden" name="boardId" th:value="${boardId}">
+            <input type="hidden" name="postId" th:value="${post.postId}">
+            <input type="hidden" name="imgName" th:value="${imgName}">
+            <button type="submit" class="btn btn-warning" id="update-btn">수정</button>
+        </form>    
+        <a th:href="@{/post/posts/search(boardId = ${boardId})}" class="btn btn-secondary float-right">목록</a><br><br>
+        
+        
+         <form th:action="@{/post/posts/{postId}/comments(postId=${post.postId})}" method="post">
+		    <div class="mb-3">
+		        <textarea name="content" class="form-control" placeholder="댓글을 입력하세요" rows="4" required></textarea>
+		    </div>
+		    <input type="hidden" name="boardId" th:value="${boardId}">
+		    <button type="submit" class="btn btn-primary">댓글 작성</button>
+		</form>
+
+		<form th:action="@{/post/posts/{postId}(postId=${post.postId})}" method="get">
+		    <input type="hidden" name="boardId" th:value="${boardId}">
+		    <input type="hidden" name="page" th:value="${currentPage}">
+		    <input type="hidden" name="size" th:value="${size}">
+		    <div class="d-flex justify-content-end">
+		        <button type="submit" name="sortOrder" value="desc" class="btn btn-info mr-2">최신순</button>
+		        <button type="submit" name="sortOrder" value="asc" class="btn btn-info">과거순</button>
+		    </div>
+		</form>
+
+		<div class="comment-list mt-3">
+		    <div th:each="comment : ${comments}" class="mb-3 border-bottom pb-2" style="position: relative;">
+		        <div>
+		            <p class="mb-0"><strong th:text="${comment.user != null ? comment.user.name : 'Anonymous'}">User Name</strong>
+		                <span class="text-muted" th:text="${comment.commentTime}">Time</span>
+		            </p>
+		            <p class="mb-1" th:text="${comment.content}">Content</p>
+		        </div>
+		
+		        <div th:if="${comment.user != null and session.user != null and comment.user.userId == session.user.userId}"
+		             style="position: absolute; right: 0; bottom: 0;">
+		            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCommentModal"
+		                th:data-comment-id="${comment.commentId}" th:data-comment-content="${comment.content}" th:data-post-id="${post.postId}">수정</button>
+		            
+		            <!-- 삭제 폼 -->
+		            <form th:action="@{/post/posts/{postId}/comments/{commentId}/delete(postId=${post.postId}, commentId=${comment.commentId})}" 
+		                  method="post" class="d-inline">
+		                <input type="hidden" name="boardId" th:value="${boardId}">
+		                <button type="submit" class="btn btn-sm btn-danger" onclick="confirmDelete()">삭제</button>
+		            </form>
+		        </div>
+		    </div>
+		
+		    <!-- 페이지네이션 -->
+			<div class="pagination mt-3 d-flex justify-content-center" th:if="${totalPages > 1}">
+			    <ul class="pagination">
+			        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+			            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage - 1})}">Previous</a>
+			        </li>
+			        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+			            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${i})}" th:text="${i + 1}"></a>
+			        </li>
+			        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+			            <a class="page-link" th:href="@{/post/posts/{postId}(postId=${post.postId}, boardId=${boardId}, page=${currentPage + 1})}">Next</a>
+			        </li>
+			    </ul>
+			</div>
+		
+		</div>
+		
+		<!-- 댓글 수정 모달 -->
+		<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="editCommentModalLabel">댓글 수정</h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <div class="modal-body">
+		                <form id="editCommentForm">
+		                    <div class="mb-3">
+		                        <textarea class="form-control" id="editCommentContent" rows="3" required></textarea>
+		                    </div>
+		                    <input type="hidden" id="commentId">
+		                    <input type="hidden" id="postId"> <!-- 추가: postId를 hidden으로 저장 -->
+		                    <button type="submit" class="btn btn-primary">수정하기</button>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+</div>
+</div>
+
+</div>
+
+
+<script src="/js/postDetails.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+<footer>
+
+<div th:replace="~{fragment/footer :: footer}"></div>
+</footer>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+ <html  lang ="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/boardList.css">
+
+<body>
+
+<div th:replace="~{fragment/navbar :: div}"></div>
+
+<div class="post-form">
+<br><h1 id="h1-center">게시판 생성</h1>
+<form action="/board/upload" method="post">
+	<div class="form-group">
+    	<label for="title">게시판 이름</label>
+            <input type="text" class="form-control" name="boardTitle"><br><br>
+            <div class="align-center">
+       			<button type="submit" class="btn btn-outline-primary">등록</button>
+        	</div>
+    </div>
+</form>
+</div>
+
+</body>
+</html>

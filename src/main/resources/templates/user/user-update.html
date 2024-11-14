@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/postUpdate.css">
+<body>
+<div th:replace="~{fragment/navbar :: div}"></div>
+<h2>Update user</h2>
+<form th:action="@{/user/user-update/{id}/edit(id=${user.userId})}" method="post">
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" name="name" id="name" th:value="${user.name}" required>
+  </div>
+  <div class="form-group">
+    <label for="password">password</label>
+    <input type="password" class="form-control" name="password" id="password" th:value="${user.password}" required>
+  </div>
+  <div class="form-group">
+    <label for="email">email</label>
+    <input type="email" class="form-control" name="email" id="email" th:value="${user.email}" required>
+  </div>
+  <div class="form-group">
+    <label for="attendance">attendance</label>
+    <input type="number" class="form-control" name="attendance" id="attendance" th:value="${user.attendance}" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Update user</button>
+</form>
+<div th:replace="~{fragment/footer :: footer}"></div>
+</body>
+</html>

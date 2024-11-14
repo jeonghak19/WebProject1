@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/postCreate.css">
+<link rel="stylesheet" href="/css/error.css">
+
+<body onload="autoResizing(document.getElementById('description'));">
+
+<div th:replace="~{fragment/navbar :: div}"></div>
+	<div class="post-form">
+    <br><h1 id="h1-center">게시글 작성</h1>
+    
+    <form action="/post/posts/create" th:object="${postDto}" method="post" enctype="multipart/form-data">
+    	<input th:if="${!session.isEmpty()}" type="hidden" name="userId" th:value="${session.user.userId}" />
+   	    <input type="hidden" name="boardId" th:value="${boardId}">
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" class="form-control" name="postTitle" id="title" required
+            		th:value="${postDto.postTitle != null ? postDto.postTitle : ''}">
+        </div>
+        <br></br>
+        
+ 	    <div class="form-group">
+            <label for="description">내용</label>
+            <textarea  class="form-control" name="description" id="description"  
+            		   th:utext="${postDto.description != null ? postDto.description : ''}"
+            		   rows="3" onkeydown="autoResizing(this)" onpaste="setTimeout(() => autoResizing(this), 0)">
+           </textarea>
+        </div>
+        <br>
+        
+        <div class="form-group">
+            <label for="file" ></label>
+            <button type="button" class="btn btn-outline-warning" onclick="openFileDialog();">파일 선택</button>
+            <input type="file" onchange="changeFile(this);" class="form-control" name ="file" id="file" accept="image/png, image/jpeg">
+            <span id="fileName" th:text="${originalFileName != null} ? ${originalFileName} : '선택된 파일이 없습니다.'"></span><br>
+     
+   		    <!-- 파일 검증 오류 메시지 표시 -->
+    		<div th:if="${#fields.hasErrors('file')}" class="error-message">
+       			 <p th:errors="*{file}"></p>
+   			</div>
+    		
+            <p id="info-text">첨부파일은 5MB이하, 파일 형식은 jpg, png만 가능합니다.</p>
+        </div><br>
+        
+        <div class="align-center">
+       		<button type="submit" class="register-button">
+       			<div>
+       				<span>등록</span>
+       				<img src="/icons/workout.png" alt="Weight Icon">
+       			</div>
+       		</button>
+        </div>
+       	<br></br>
+       	 
+    </form>
+    </div>
+
+<div th:replace="~{fragment/footer :: footer}"></div>
+
+</body>
+</html>

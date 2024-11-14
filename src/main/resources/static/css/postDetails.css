@@ -1,0 +1,88 @@
+
+.post-detail-form {
+	margin : 40px 150px 10px 150px;
+	padding: 50px 50px 50px 50px;
+	webkit-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	moz-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	border-radius: 20px;
+}
+
+.top-item {
+	margin-top:25px;
+}
+
+#post-user {
+	margin-top: 15px;
+}
+
+#user-icon {
+	width: 50px; 
+	height: 50px; 
+	float: left;
+}
+
+#like-icon {
+	width: 23px;
+	height: 23px;
+	float: right; 
+	margin-left:15px;
+}
+
+.count {
+	 float: right; 
+	 margin-left:5px;
+} 
+
+#post-username {
+	float: left; 
+	margin-left:11px;
+}
+
+.float-right {
+	float: right;
+}
+
+#view-icon {
+	width:30px;
+	height: 30px;
+	float: right;
+}
+
+#update-btn {
+	float: right; 
+	margin-left: 8px;
+}
+
+.post-body {
+	margin-left:60px; 
+	margin-right:60px;
+}
+
+.post-div {
+	 display: flex; 
+	 justify-content: center;
+}
+
+
+.post-image {
+	 max-width: 720px; 
+	 max-height:540px;
+}
+
+.post-desc {
+	font-size:17px;
+	word-spacing:5px; 
+	line-height:35px;
+}
+
+#likeButton {
+	 background: none; 
+	 border: none;
+	 filter: invert(21%) sepia(91%) saturate(4925%) hue-rotate(354deg) brightness(91%) contrast(122%);
+} 
+
+#like-btn-div {
+	 display: flex; 
+	 justify-content: center;
+}

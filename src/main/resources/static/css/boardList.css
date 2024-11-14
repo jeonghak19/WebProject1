@@ -1,0 +1,184 @@
+body {
+	background-color: #ffffff; /* 연한 그레이 배경 */
+	color: #343a40; /* 다크 그레이 텍스트 색상 */
+	font-family: 'Arial', sans-serif;
+}
+
+.container {
+	margin-top: 30px;
+}
+
+.top-item {
+	padding: 20px;
+	background-color: #ffffff; /* 화이트 배경 */
+	border-radius: 10px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.image-container {
+	margin-bottom: 30px;
+}
+
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 20px;
+}
+
+.card {
+	background-color: #f1f3f5;
+	border: 1px solid #dee2e6;
+	border-radius: 10px;
+	padding: 15px;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3); /* hover 시 더 짙고 넓은 그림자 */
+}
+
+.card-title {
+	font-size: 1.25rem;
+	font-weight: bold;
+	color: #495057;
+}
+
+.card-body {
+	text-align: center;
+}
+
+.card a {
+    background-color: #dee2e6;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    width: 75px; 
+    height: 75px; 
+}
+
+.card a img {
+    width: 100%; /* 부모 요소인 a 태그에 맞게 이미지 크기 조정 */
+    height: 100%; /* 부모 요소인 a 태그에 맞게 이미지 크기 조정 */
+    object-fit: cover; /* 이미지가 비율에 맞게 잘리도록 설정 */
+}
+
+
+.card a:hover {
+	background-color: #5a6268;
+}
+
+
+.create-btn {
+	background-color: #fff!important;
+	color: #ced4da  !important;
+	padding: 10px 20px !important;
+	border-radius: 5px !important;
+	text-decoration: none !important;
+	font-weight: bold !important;
+	margin-top: 20px !important;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.create-btn:hover {
+	background-color: #adb5bd !important;
+	box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+}
+
+
+
+
+
+/* 관리자의 게시판 생성 버튼 */
+form {
+	text-align: center;
+}
+
+
+
+
+
+/* 슬라이더 스타일 */
+li {
+	list-style: none;
+}
+
+.kind_wrap {
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	position: relative;
+	overflow: hidden;
+}
+
+.kind_slider {
+	width: 100%;
+	height: 200px;
+}
+
+.slider {
+	display: flex;
+	width: calc(100% * 3); /* 슬라이드 개수에 맞춰서 수정 */
+	transition: transform 0.5s ease;
+}
+
+.slider li {
+	width: 100%;
+	flex: 0 0 100%; /* 슬라이드가 전체 너비를 차지하도록 설정 */
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.slider li img {
+    width: 800px;  /* 고정 너비 */
+    height: 200px; /* 고정 높이 */
+    object-fit: fill;
+}
+
+
+
+
+/* 페이지네이션 스타일 */
+.pagination {
+	display: flex;
+	justify-content: center; /* 중앙 정렬 */
+	align-items: center; /* 수직 정렬 */
+	margin-top: 10px;
+}
+
+.pagination .dot {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin: 0 5px;
+	background-color: #ddd;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.pagination .dot.active {
+	background-color: #6c757d;
+}
+.post-form {
+	margin : 100px 250px 100px 250px;
+	padding: 20px 60px 40px 60px;
+	webkit-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	moz-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	border-radius: 20px;
+}
+
+.form-group {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.align-center {
+	display: flex;
+	justify-content: center;
+}
+
+#h1-center {
+	text-align: center;
+}

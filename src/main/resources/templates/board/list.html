@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/boardList.css">
+<body>
+<div th:replace="~{fragment/navbar :: div}"></div>
+
+<div class="kind_wrap">
+	<div class="kind_slider">
+		<ul class="slider">
+			<li>
+				<a href="https://blackbatsports.com/product/list.html?cate_no=49" target="_blank"> <!-- 새 창으로 열기 위해 target="_blank" 추가 -->
+					<img src="/images/슬라이더1.png" alt="">
+				</a>
+			</li>
+			<li>
+				<a href="https://lifemarathon.co.kr/" target="_blank"> <!-- 새 창으로 열기 위해 target="_blank" 추가 -->
+					<img src="/images/슬라이더2.png" alt="">
+				</a>
+			</li>
+			<li>
+				<a href="https://www.myprotein.co.kr/sports-nutrition/myprotein-the-origin-dryscoop/15294075.html" target="_blank"> <!-- 새 창으로 열기 위해 target="_blank" 추가 -->
+					<img src="/images/슬라이더3.png" alt="">
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="pagination">
+		<span data-index="0" class="dot active"></span>
+		<span data-index="1" class="dot"></span>
+		<span data-index="2" class="dot"></span>
+	</div>
+</div>
+
+
+<div class="container top-item">
+	<div class="image-container text-center mb-4">
+		<img src="/images/Health_Mate.png" alt="Board Image" class="img-fluid" style="max-width: 100%; height: auto;">
+	</div>
+	<div class="grid text-center card-grid">
+		<div class="card" th:each="board : ${boards}">
+			<div class="card-body">
+				<div>
+					<h3 class="card-title" th:text="${board.boardTitle}"></h3>
+					<a th:href="@{/post/posts/search(boardId=${board.boardId})}" class="btn btn-outline">
+						<img th:src="@{'/icons/boardlisticon' + ${board.boardId} + '.png'}" alt="Board Icon" >
+					
+
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<form th:if="${session != null and session.user != null and session.user.name == '관리자'}" action="/board/create" method="get">
+		<br><button type="submit" class="btn btn-outline-dark create-btn">게시판 생성</button><br>
+	</form>
+</div>
+
+<!-- Footer 템플릿 포함 -->
+<div th:replace="~{fragment/footer:: footer}"></div>
+<script src="/js/boardList.js"></script>
+</body>
+</html>
