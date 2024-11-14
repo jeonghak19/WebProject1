@@ -54,13 +54,18 @@ public class UserController {
 
     // 사용자 등록
     @PostMapping("/user/register")
-    public String registerUser(@Valid @ModelAttribute User user,
+    public String registerUser(@Valid @ModelAttribute("user") UserPostDto userPostDto,
                                BindingResult bindingResult,
                                Model model) {
         if (bindingResult.hasErrors()) {
             return "user/register"; // 오류가 있으면 register.html로 다시 돌아감
         }
 
+        if (userService.findUserByName(userPostDto.getName()) != null) {
+            model.addAttribute("nameErr", "중복된 이름이 있습니다.");
+            return "user/register"; // 중복 Id 있으면 register.html로 다시 돌아감
+        }
+        User user = UserMapper.toEntity(userPostDto);
         userService.createUser(user);
         return "user/login";
     }
@@ -68,7 +73,7 @@ public class UserController {
     // 등록화면 이동
     @GetMapping("/user/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new User()); // 빈 User 객체를 폼에 전달
+        model.addAttribute("user", new UserPostDto()); // 빈 User 객체를 폼에 전달
         return "user/register"; // 회원가입 폼을 반환 (register.html)
     }
 
