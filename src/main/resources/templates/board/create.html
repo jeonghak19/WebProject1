@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <head th:replace="~{fragment/header :: head}"></head>
-	<meta charset="UTF-8">
-	<title>Create Board</title>
-</head>
+ <html  lang ="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/header :: head}"></head>
+<link rel="stylesheet" href="/css/boardList.css">
 
 <body>
 
 <div th:replace="~{fragment/navbar :: div}"></div>
 
+<div class="post-form">
 <br><h1 id="h1-center">게시판 생성</h1>
 <form action="/board/upload" method="post">
 	<div class="form-group">
@@ -20,5 +18,7 @@
         	</div>
     </div>
 </form>
+</div>
+
 </body>
 </html>

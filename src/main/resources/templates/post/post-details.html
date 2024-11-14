@@ -9,6 +9,7 @@
 <body>
 <div th:replace="~{fragment/navbar :: div}"></div>
 
+<div class= "post-detail-form">
 <div class="container">
    
     <h1 class ="top-item" th:text="${post.postTitle}"></h1>
@@ -43,11 +44,11 @@
             		<input type="hidden" name="postId" th:value="${post.postId}">
             		<input type="hidden" name="userId" th:value="${session.user.userId}">
 					<span id="likeCount">좋아요</span>
-					<button th:if="${liked}" type="button" id="likeButton" onclick="toggleLike()">
-						<img class="like-btn" src="/icons/heart-fill.svg">
+					<button th:if="${liked}" type="button" id="likeButton" onclick="toggleLike()"> 
+						<img class="like-btn" src="/icons/heart-fill.png">
 					</button>
 					<button th:if="${!liked}" type="button" id="likeButton" onclick="toggleLike()">
-						<img class="like-btn" src="/icons/heart.svg">
+						<img class="like-btn" src="/icons/heart.png">
 					</button>
         		</form>
     		</div>    		
@@ -62,7 +63,7 @@
         <a th:href="@{/post/posts/search(boardId = ${boardId})}" class="btn btn-secondary float-right">목록</a><br><br>
         
         
-        <form th:action="@{/post/posts/{postId}/comments(postId=${post.postId})}" method="post">
+         <form th:action="@{/post/posts/{postId}/comments(postId=${post.postId})}" method="post">
 		    <div class="mb-3">
 		        <textarea name="content" class="form-control" placeholder="댓글을 입력하세요" rows="4" required></textarea>
 		    </div>
@@ -143,8 +144,7 @@
 		</div>
 
 </div>
-
-
+</div>
 
 </div>
 

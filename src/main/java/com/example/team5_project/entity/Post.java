@@ -57,7 +57,7 @@ public class Post extends BaseEntity {
     			.user(user)
     			.board(board)
     			.postTitle(postTitle)
-    			.description(description)
+    			.description(description.replace("<br>", "\r\n"))
     			.imgName(imgName)
     			.imgPath(imgPath)
     			.build();

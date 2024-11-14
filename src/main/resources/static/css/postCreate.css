@@ -1,0 +1,81 @@
+
+.post-form {
+	margin : 40px 150px 10px 150px;
+	padding: 30px 40px 40px 40px;
+	webkit-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	moz-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	border-radius: 20px;
+}
+
+.form-group {
+	max-width: 800px; 
+	margin: 0 auto;
+}
+
+#description {
+	width:100%; 
+	overflow: hidden; 
+	resize: none; 
+	height: 100px;	  
+}
+
+.align-center {
+	display: flex; 
+	justify-content: center;
+}
+
+#file {
+	display: none;
+}
+
+#info-text {
+	font-size: 13px;
+}
+
+#h1-center {
+	text-align: center;
+}
+
+
+.register-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	border: none;
+	background-color: transparent;
+	border-radius: 5px;
+	padding: 10px 20px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: transform 0.3s ease;
+}
+
+.register-button img {
+	width: 40px;
+	margin-right: 8px;
+	transition: transform 0.3s ease;
+}
+
+
+.register-button:hover {
+	transform: translateY(-5px);
+}
+
+
+.register-button:active {
+	transform: translateY(2px);
+}
+
+
+.register-button:hover img {
+	transform: translateY(-3px);
+}
+
+.register-button span {
+	color: black;
+	font-weigth: bolder;
+}
+

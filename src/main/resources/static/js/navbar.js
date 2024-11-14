@@ -49,9 +49,9 @@ function toggleLike() {
 		        const likeCount = document.getElementById('likeCount');
 		        
 		        if (data.liked) {
-		            likeButton.innerHTML = `<img class="like-btn" src="/icons/heart-fill.svg">`;
+		            likeButton.innerHTML = `<img class="like-btn" src="/icons/heart-fill.png">`;
 		        } else {
-		            likeButton.innerHTML = `<img class="like-btn" src="/icons/heart.svg">`;
+		            likeButton.innerHTML = `<img class="like-btn" src="/icons/heart.png">`;
 		        }
 		        
 		        likeCount.textContent = `좋아요: ${data.likeCount}`;
