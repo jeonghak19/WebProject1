@@ -1,6 +1,5 @@
 package com.example.team5_project.repository;
 
-import com.example.team5_project.entity.Board;
 import com.example.team5_project.entity.Post;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,9 +11,6 @@ import com.example.team5_project.entity.Comment;
 import com.example.team5_project.entity.User;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 

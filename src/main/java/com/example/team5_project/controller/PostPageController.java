@@ -1,9 +1,7 @@
 package com.example.team5_project.controller;
 
-import com.example.team5_project.entity.Post;
 import com.example.team5_project.service.BoardService;
 import com.example.team5_project.service.PostPageService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

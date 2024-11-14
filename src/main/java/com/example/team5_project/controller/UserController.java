@@ -44,7 +44,7 @@ public class UserController {
     // 이름 중복 체크
     @GetMapping("/user/check-name")
     @ResponseBody
-    public Map<String, Object> checkName(@RequestParam String name) {
+    public Map<String, Object> checkName(@RequestParam("name") String name) {
         Map<String, Object> response = new HashMap<>();
         User existingUser = userService.findUserByName(name);
         response.put("isAvailable", existingUser == null); // 중복되지 않으면 true, 중복되면 false
@@ -88,8 +88,8 @@ public class UserController {
     // 사용자 수정
     @PostMapping("/user/user-update/{id}/edit")
     public String updateUser(@PathVariable("id") Long id,
-                             @ModelAttribute User user, Model model,
-                             @RequestParam(defaultValue = "0") int page) {
+                             @ModelAttribute("user") User user, Model model,
+                             @RequestParam(value="page" ,defaultValue = "0") int page) {
 
         int pageSize = 5; // 한 페이지에 보여줄 게시물 개수
         Pageable pageable = PageRequest.of(page, pageSize);
@@ -110,10 +110,10 @@ public class UserController {
 
     // 특정 사용자 상세 정보 가져오기
     @GetMapping("/user/user-details/{id}")
-    public String getUser(@PathVariable Long id,
+    public String getUser(@PathVariable("id") Long id,
                           Model model,HttpSession session,
-                          @RequestParam(defaultValue = "0") int postPage,
-                          @RequestParam(defaultValue = "0") int commentPage) {
+                          @RequestParam(value="postPage", defaultValue = "0") int postPage,
+                          @RequestParam(value="commentPage", defaultValue = "0") int commentPage) {
         User loginUser = (User) session.getAttribute("user");
 
         int postPageSize = 5; // 한 페이지에 보여줄 게시물 개수
@@ -145,7 +145,7 @@ public class UserController {
 
     // 로그인 처리
     @PostMapping("/user/login")
-    public String login(@RequestParam String name, @RequestParam String password, HttpSession session, Model model) {
+    public String login(@RequestParam("name") String name, @RequestParam("password") String password, HttpSession session, Model model) {
 
         User user = userService.findUserByName(name);
 
@@ -167,5 +167,3 @@ public class UserController {
         return "redirect:/user/login";  // 로그인 페이지로 리디렉션
     }
 }
-
-
