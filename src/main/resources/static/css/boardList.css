@@ -49,13 +49,20 @@ body {
 }
 
 .card a {
-	background-color: #6c757d;
-	color: #fff;
-	padding: 8px 15px;
-	text-decoration: none;
-	border-radius: 5px;
-	margin-top: 10px;
+    background-color: #dee2e6;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    width: 75px; 
+    height: 75px; 
 }
+
+.card a img {
+    width: 100%; /* 부모 요소인 a 태그에 맞게 이미지 크기 조정 */
+    height: 100%; /* 부모 요소인 a 태그에 맞게 이미지 크기 조정 */
+    object-fit: cover; /* 이미지가 비율에 맞게 잘리도록 설정 */
+}
+
 
 .card a:hover {
 	background-color: #5a6268;
@@ -63,8 +70,8 @@ body {
 
 
 .create-btn {
-	background-color: #ced4da !important;
-	color: #fff !important;
+	background-color: #fff!important;
+	color: #ced4da  !important;
 	padding: 10px 20px !important;
 	border-radius: 5px !important;
 	text-decoration: none !important;
@@ -78,34 +85,16 @@ body {
 	box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
 }
 
-.post-form {
-	margin : 100px 250px 100px 250px;
-	padding: 20px 60px 40px 60px;
-	webkit-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
-	moz-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
-	box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
-	border-radius: 20px;
-}
 
-.form-group {
-	max-width: 800px; 
-	margin: 0 auto;
-}
 
-.align-center {
-	display: flex; 
-	justify-content: center;
-}
-
-#h1-center {
-	text-align: center;
-}
 
 
 /* 관리자의 게시판 생성 버튼 */
 form {
 	text-align: center;
 }
+
+
 
 
 
@@ -140,6 +129,14 @@ li {
 	box-sizing: border-box;
 }
 
+.slider li img {
+    width: 800px;  /* 고정 너비 */
+    height: 200px; /* 고정 높이 */
+    object-fit: fill;
+}
+
+
+
 
 /* 페이지네이션 스타일 */
 .pagination {
@@ -162,4 +159,26 @@ li {
 
 .pagination .dot.active {
 	background-color: #6c757d;
+}
+.post-form {
+	margin : 100px 250px 100px 250px;
+	padding: 20px 60px 40px 60px;
+	webkit-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	moz-box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	box-shadow: 8px 13px 28px -12px rgba(66, 68, 90, 0.84);
+	border-radius: 20px;
+}
+
+.form-group {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.align-center {
+	display: flex;
+	justify-content: center;
+}
+
+#h1-center {
+	text-align: center;
 }

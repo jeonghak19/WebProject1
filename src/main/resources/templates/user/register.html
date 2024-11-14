@@ -7,7 +7,7 @@
 <body class="bg-light text-dark">
 <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
   <div class="text-center">
-    <img src="/images/Health_Mate.jpg" alt="Website Logo">
+    <img src="/images/Health_Mate.png" alt="Website Logo">
   </div>
   <div class="card shadow-sm border-0" style="width: 100%; max-width: 400px;">
     <div class="card-header text-center bg-secondary text-white">
@@ -51,7 +51,7 @@
           <input type="password" id="confirm_password" name="confirm_password" class="form-control bg-light border-1" required>
         </div>
 
-        <button type="submit" class="btn btn-outline-success w-100 mt-3">회원가입</button>
+        <button type="submit" id="registerBtn" class="btn btn-outline-success w-100 mt-3">회원가입</button>
       </form>
 
       <div class="mt-3 text-center">
@@ -67,5 +67,8 @@
   </div>
 </div>
 <script th:src="@{/js/register.js}"></script>
+<script th:if="${nameErr != null}">
+  alert("[[${nameErr}]]");
+</script>
 </body>
 </html>

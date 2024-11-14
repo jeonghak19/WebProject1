@@ -1,10 +1,14 @@
+let isNameAvailable = false;
+
 document.getElementById('checkNameBtn').addEventListener('click', function() {
     const name = document.getElementById('name').value;
     const nameCheckResult = document.getElementById('nameCheckResult');
 
-    // 비어 있지 않으면 유효성 검사 시작
     if (name.trim().length < 2) {
         nameCheckResult.textContent = "이름을 입력해주세요.";
+        nameCheckResult.style.color = "red";
+        isNameAvailable = false;
+        toggleRegisterButton();
         return;
     }
 
@@ -14,16 +18,22 @@ document.getElementById('checkNameBtn').addEventListener('click', function() {
             if (data.isAvailable) {
                 nameCheckResult.textContent = "사용 가능한 이름입니다.";
                 nameCheckResult.style.color = "blue";
+                isNameAvailable = true;
             } else {
                 nameCheckResult.textContent = "이미 존재하는 이름입니다.";
                 nameCheckResult.style.color = "red";
+                isNameAvailable = false;
             }
+            toggleRegisterButton();
         })
         .catch(error => {
             nameCheckResult.textContent = "오류가 발생했습니다. 다시 시도해주세요.";
             nameCheckResult.style.color = "red";
+            isNameAvailable = false;
+            toggleRegisterButton();
         });
 });
+
 document.querySelector('form').addEventListener('submit', function(event) {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm_password').value;
@@ -33,3 +43,7 @@ document.querySelector('form').addEventListener('submit', function(event) {
         event.preventDefault();
     }
 });
+
+function toggleRegisterButton() {
+    document.getElementById('registerBtn').disabled = !isNameAvailable;
+}
