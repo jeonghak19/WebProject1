@@ -22,12 +22,5 @@ Spring 을 사용한 게시판 토이프로젝트
 - 페이지 처리
 - 파일 추가
 
-## 화면 레이아웃
-- frontend
-> cd frontend && npm run start
-
-- backend
-> mvn spring-boot:run
-
-- Admin account information
-> ID : test / PW : test
+## 사진 예시
+Img 파일 참고
